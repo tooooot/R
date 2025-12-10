@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفقات - تداول الذكاء الاصطناعي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            color: #fff;
+        }
+
+        .page-container {
+            max-width: 393px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 12px 12px 80px 12px;
+        }
+
+        .header {
+            padding: 16px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            font-weight: 700;
+            border-color: #ffd700;
+        }
+
+        .trades-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .trade-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        .trade-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .trade-stock {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .trade-status {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        .trade-status.active {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .trade-status.completed {
+            background: rgba(147, 112, 219, 0.2);
+            color: #9370db;
+        }
+
+        .trade-robot {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10px;
+        }
+
+        .trade-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .detail-item {
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .detail-value {
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .profit.positive {
+            color: #00ff88;
+        }
+
+        .profit.negative {
+            color: #ff6b6b;
+        }
+
+        .view-details-btn {
+            width: 100%;
+            padding: 8px;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            color: #ffd700;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 393px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .nav-item.active {
+            color: #ffd700;
+        }
+
+        .nav-item.center {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            transform: scale(1.15);
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item.center .nav-icon {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <div class="header">
+            <h1>📋 الصفقات</h1>
+            <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 4px;">جميع صفقات الروبوتات</p>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterTrades('all')">الكل</button>
+            <button class="filter-btn" onclick="filterTrades('active')">نشطة</button>
+            <button class="filter-btn" onclick="filterTrades('completed')">مكتملة</button>
+        </div>
+
+        <div class="trades-list" id="tradesList">
+            <!-- Sample trades -->
+            <div class="trade-card">
+                <div class="trade-header">
+                    <div class="trade-stock">📈 أرامكو (2222)</div>
+                    <div class="trade-status active">نشطة</div>
+                </div>
+                <div class="trade-robot">🤖 صياد الفرص</div>
+                <div class="trade-details">
+                    <div class="detail-item">
+                        <div class="detail-label">الدخول</div>
+                        <div class="detail-value">28.50</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">الحالي</div>
+                        <div class="detail-value">29.20</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">الربح</div>
+                        <div class="detail-value profit positive">+2.5%</div>
+                    </div>
+                </div>
+                <button class="view-details-btn" onclick="viewDetails('trade1')">عرض التفاصيل</button>
+            </div>
+
+            <div class="trade-card">
+                <div class="trade-header">
+                    <div class="trade-stock">📊 الراجحي (1120)</div>
+                    <div class="trade-status completed">مكتملة</div>
+                </div>
+                <div class="trade-robot">🦾 المحلل الذكي</div>
+                <div class="trade-details">
+                    <div class="detail-item">
+                        <div class="detail-label">الدخول</div>
+                        <div class="detail-value">87.00</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">الخروج</div>
+                        <div class="detail-value">88.50</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">الربح</div>
+                        <div class="detail-value profit positive">+1.7%</div>
+                    </div>
+                </div>
+                <button class="view-details-btn" onclick="viewDetails('trade2')">عرض التفاصيل</button>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/trades" class="nav-item active">
+            <div class="nav-icon">📋</div>
+            <div>الصفقات</div>
+        </a>
+        <a href="/portfolio" class="nav-item">
+            <div class="nav-icon">💼</div>
+            <div>المحفظة</div>
+        </a>
+        <a href="/robots" class="nav-item center">
+            <div class="nav-icon">🤖</div>
+            <div>الروبوتات</div>
+        </a>
+        <a href="/reporter" class="nav-item">
+            <div class="nav-icon">📰</div>
+            <div>الراصد</div>
+        </a>
+        <a href="/more" class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div>المزيد</div>
+        </a>
+    </nav>
+
+    <script>
+        function filterTrades(type) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            // Filter logic here
+        }
+
+        function viewDetails(tradeId) {
+            window.location.href = `/trade/${tradeId}`;
+        }
+    </script>
+</body>
+
+</html>

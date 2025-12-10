@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق المتداول الذكي</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <script src="/static/js/lightweight-charts.js"></script>
+    <!-- OneSignal Push Notifications -->
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+    <script>
+        // OneSignal Initialization
+        window.OneSignal = window.OneSignal || [];
+        OneSignal.push(function () {
+            OneSignal.init({
+                appId: "YOUR_ONESIGNAL_APP_ID", // ⚠️ استبدل هذا بالـ App ID من OneSignal
+                allowLocalhostAsSecureOrigin: true,
+                notifyButton: {
+                    enable: false
+                },
+                welcomeNotification: {
+                    title: "مرحباً بك! 🎉",
+                    message: "سنرسل لك إشعارات عن الصفقات الرابحة والفرص الاستثمارية"
+                }
+            });
+        });
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(reg => console.log('SW Registered!', reg))
+                .catch(err => console.log('SW Failed', err));
+        }
+    </script>
+    <style>
+        /* Mobile Specific Overrides */
+        body {
+            background: #000;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+
+        .app-header {
+            padding: 2rem 1rem;
+            background: linear-gradient(to bottom, #1a1a2e, #000);
+            text-align: center;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1a1a2e;
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem;
+            border-top: 1px solid #333;
+            z-index: 9999;
+            /* Ensure top layer */
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .nav-item {
+            color: #888;
+            font-size: 0.8rem;
+            text-align: center;
+            cursor: pointer;
+            /* Interaction feedback */
+            padding: 5px;
+            flex: 1;
+            transition: color 0.2s;
+        }
+
+        .nav-item:hover {
+            color: #fff;
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+
+        .section-title {
+            padding: 1rem;
+            color: #fff;
+            font-size: 1.2rem;
+            border-left: 4px solid var(--accent-gold);
+            margin: 1rem 0;
+            background: #111;
+        }
+
+        .rec-card {
+            background: #1c1c1e;
+            margin: 0.5rem 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .rec-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .rec-symbol {
+            font-weight: bold;
+            color: var(--accent-gold);
+        }
+
+        .rec-price {
+            color: #fff;
+        }
+
+        .rec-reason {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 0.5rem;
+        }
+
+        .verified-badge {
+            color: var(--accent-green);
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .bot-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .bot-profile {
+            background: #1c1c1e;
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .follow-btn {
+            background: var(--accent-gold);
+            color: #000;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin-top: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-header">
+        <h1>مجتمع النخبة</h1>
+        <p>تابع أفضل خوارزميات الذكاء الاصطناعي</p>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div id="home-view">
+        <div style="text-align:center; padding:10px;">
+            <button id="pwa-install-btn"
+                style="display:none; background:#333; color:#fff; border:1px solid #555; padding:8px 15px; border-radius:20px; font-size:0.8rem;">📲
+                تثبيت التطبيق</button>
+            <button onclick="requestNotifs()"
+                style="background:#333; color:#fff; border:1px solid #555; padding:8px 15px; border-radius:20px; font-size:0.8rem;">🔔
+                تفعيل التنبيهات</button>
+        </div>
+
+        <div class="section-title">توصيات المحقق (المعتمدة)</div>
+        <div id="rec-feed">
+            <!-- Recommendations injected here -->
+            <div class="rec-card">
+                <div class="rec-header">
+                    <span class="rec-symbol">جار التحميل...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">أفضل الريبوتات هذا الأسبوع</div>
+        <div class="bot-list" id="bot-grid">
+            <!-- Bots injected here -->
+        </div>
+    </div>
+
+    <!-- Bot Detail View (Hidden by default) -->
+    <div id="detail-view"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:200; overflow-y:auto; padding-bottom:80px;">
+        <div style="padding:1rem;">
+            <button onclick="closeDetail()"
+                style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer;">✖ إغلاق</button>
+
+            <div id="detail-content" style="margin-top:2rem;">
+                <!-- Content injected via JS -->
+            </div>
+
+            <div class="section-title">سجل الصفقات (المصداقية)</div>
+            <div id="detail-history"></div>
+
+            <div class="section-title">سجلات المحقق</div>
+            <div id="detail-logs"></div>
+        </div>
+    </div>
+    <!-- Deal Report Modal -->
+    <div id="deal-report-view"
+        style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:300; overflow-y:auto; padding-bottom:80px;">
+        <div style="padding:1rem;">
+            <button onclick="closeDealReport()"
+                style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer; float:left;">✖</button>
+            <div style="clear:both; text-align:center; margin-bottom:1rem;">
+                <h2 style="color:var(--accent-gold); border-bottom:1px solid #333; padding-bottom:10px;">📄 تقرير الصفقة
+                    الاحترافي</h2>
+            </div>
+
+            <div id="report-content"></div>
+        </div>
+    </div>
+
+    <!-- News View -->
+    <div id="news-view" style="display:none; padding-bottom:80px;">
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+            <span>صحيفة المتداول</span>
+            <span style="font-size:0.8rem; background:#333; padding:2px 8px; border-radius:10px;">🔴 مباشر</span>
+        </div>
+        <div id="news-content"></div>
+    </div>
+
+    <!-- Sticky Nav -->
+    <nav class="nav-bar">
+        <div class="nav-item active"
+            onclick="switchView('home-view'); document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); this.classList.add('active');">
+            🏠 الرئيسية</div>
+        <div class="nav-item" onclick="window.location.href='/news'">📰 الأخبار</div>
+        <div class="nav-item" onclick="window.location.href='/live/mobile'">🎥 البث</div>
+        <div class="nav-item">👤 حسابي</div>
+    </nav>
+
+    <script src="/static/js/mobile.js?v=3"></script>
+</body>
+
+</html>

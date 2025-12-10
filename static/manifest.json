@@ -1,0 +1,16 @@
+{
+    "name": "المتداول الذكي",
+    "short_name": "المتداول",
+    "start_url": "/app",
+    "display": "standalone",
+    "background_color": "#000000",
+    "theme_color": "#000000",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/static/images/icon.png",
+            "sizes": "1024x1024",
+            "type": "image/png"
+        }
+    ]
+}

@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>البث المباشر - تداول الذكاء الاصطناعي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: #000;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(147, 112, 219, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%);
+            color: #fff;
+        }
+
+        .broadcast-container {
+            width: 100%;
+            max-width: 393px;
+            height: 100vh;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            gap: 8px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        /* Live Badge */
+        .live-badge-container {
+            text-align: center;
+            margin: 4px 0;
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: linear-gradient(90deg, #ff0050, #ff3366);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(255, 0, 80, 0.4);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        /* Title */
+        .main-title {
+            text-align: center;
+            padding: 6px 0;
+        }
+
+        .main-title h2 {
+            font-size: 1.15rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            margin-bottom: 4px;
+        }
+
+        .main-title p {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Rotating Phrases */
+        .rotating-phrase {
+            font-size: 0.7rem;
+            color: rgba(255, 215, 0, 0.9);
+            text-align: center;
+            height: 20px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 4px;
+        }
+
+        .phrase {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .phrase.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stock Ticker */
+        .stock-ticker {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 6px 0;
+            margin: 8px 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticker-track {
+            display: flex;
+            animation: scroll 30s linear infinite;
+            gap: 20px;
+        }
+
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            font-size: 0.7rem;
+            padding: 0 10px;
+        }
+
+        .ticker-symbol {
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .ticker-price {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .ticker-change {
+            font-weight: 700;
+            font-size: 0.65rem;
+        }
+
+        .ticker-change.up {
+            color: #00ff88;
+        }
+
+        .ticker-change.down {
+            color: #ff6b6b;
+        }
+
+        /* Carousel Container */
+        .carousel-container {
+            flex: 1;
+            position: relative;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .carousel-slides {
+            height: 100%;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        /* Carousel Indicators */
+        .carousel-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px 0;
+        }
+
+        .indicator {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .indicator.inactive {
+            width: 6px;
+            border-radius: 50%;
+        }
+
+        .indicator.active {
+            width: 25px;
+            background: #ffd700;
+        }
+
+        /* Progress Bar with Shimmer */
+        .progress-bar-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* News Section */
+        .news-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .news-title {
+            font-size: 0.75rem;
+            color: #ffd700;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .news-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 0;
+            font-size: 0.7rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            animation: slideIn 0.5s ease;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .news-icon {
+            font-size: 1rem;
+        }
+
+        .news-text {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .news-time {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Slide Specific Styles */
+        .countdown-display {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #ffd700;
+            margin: 10px 0;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 6px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.6rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .robot-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .robot-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .profit-display {
+            font-size: 2rem;
+            font-weight: 900;
+            text-align: center;
+            margin: 12px 0;
+            text-shadow: 0 0 20px currentColor;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="broadcast-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <span>⚡ <span id="currentTime">9:41</span></span>
+            <span>📶 🔋</span>
+        </div>
+
+        <!-- Live Badge -->
+        <div class="live-badge-container">
+            <div class="live-badge">
+                <div class="live-dot"></div>
+                🔴 بث مباشر
+            </div>
+        </div>
+
+        <!-- Main Title -->
+        <div class="main-title">
+            <h2>🤖 سباق الذكاء الاصطناعي</h2>
+            <p id="challengeInfo">تحدي 5 أيام • 8 روبوتات • 100,000 ر.س</p>
+            <div class="rotating-phrase" id="rotatingPhrase">
+                <div class="phrase active">شاهد الروبوتات تتداول مباشرة في السوق السعودي</div>
+                <div class="phrase">تنبيهات فورية للصفقات في التطبيق</div>
+                <div class="phrase">تحليلات ذكاء اصطناعي متقدمة</div>
+                <div class="phrase">تحدي 5 أيام • الأفضل يفوز</div>
+                <div class="phrase">تابع التفاصيل في الرابط بالأسفل</div>
+            </div>
+        </div>
+
+        <!-- Stock Ticker -->
+        <div class="stock-ticker">
+            <div class="ticker-track" id="tickerTrack">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Carousel -->
+        <div class="carousel-container">
+            <div class="carousel-slides" id="carouselSlides">
+                <!-- Slides will be dynamically generated -->
+            </div>
+        </div>
+
+        <!-- Carousel Indicators -->
+        <div class="carousel-indicators" id="indicators">
+            <!-- Will be dynamically generated -->
+        </div>
+
+        <!-- News Section -->
+        <div class="news-section" id="newsContainer">
+            <div class="news-title">📰 آخر التحديثات</div>
+            <!-- News items will be dynamically generated -->
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let robotsData = [];
+        let currentSlide = 0;
+        let totalSlides = 6;
+
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = `${hours}:${minutes}`;
+        }
+        updateTime();
+        setInterval(updateTime, 60000);
+
+        // Fetch robots data from API
+        async function fetchRobotsData() {
+            try {
+                const response = await fetch('/api/robots');
+                if (response.ok) {
+                    robotsData = await response.json();
+                    updateCarousel();
+                    updateNewsFromData();
+                }
+            } catch (error) {
+                console.error('Error fetching robots data:', error);
+                // Use fallback data
+                useFallbackData();
+            }
+        }
+
+        // Fallback data if API is not available
+        function useFallbackData() {
+            robotsData = [
+                { name: 'صياد الفرص', emoji: '🤖', balance: 112500, profit_percent: 12.5, wins: 15, losses: 3 },
+                { name: 'المحلل الذكي', emoji: '🦾', balance: 108200, profit_percent: 8.2, wins: 14, losses: 4 },
+                { name: 'البرق السريع', emoji: '⚡', balance: 106800, profit_percent: 6.8, wins: 13, losses: 5 },
+                { name: 'القناص', emoji: '🎯', balance: 105200, profit_percent: 5.2, wins: 12, losses: 6 },
+                { name: 'العقل المدبر', emoji: '🧠', balance: 103500, profit_percent: 3.5, wins: 11, losses: 7 },
+                { name: 'الجريء', emoji: '🔥', balance: 101800, profit_percent: 1.8, wins: 10, losses: 8 },
+                { name: 'الحارس', emoji: '🛡️', balance: 100500, profit_percent: 0.5, wins: 9, losses: 9 },
+                { name: 'الموجة', emoji: '🌊', balance: 98200, profit_percent: -1.8, wins: 8, losses: 10 }
+            ];
+            updateCarousel();
+            updateNewsFromData();
+        }
+
+        // Initialize - fetch data
+        fetchRobotsData();
+        setInterval(fetchRobotsData, 5000); // Update every 5 seconds
+
+        // Generate carousel slides based on robot data
+        function updateCarousel() {
+            if (robotsData.length === 0) return;
+
+            const slidesContainer = document.getElementById('carouselSlides');
+            slidesContainer.innerHTML = '';
+
+            const leader = robotsData[0];
+            const top3 = robotsData.slice(0, 3);
+
+            // Slide 1: Countdown + Leader
+            slidesContainer.innerHTML += createSlide1(leader);
+
+            // Slide 2: Leader Details
+            slidesContainer.innerHTML += createSlide2(leader);
+
+            // Slide 3: Top 3 Race
+            slidesContainer.innerHTML += createSlide3(top3);
+
+            // Slide 4: Best Trade (placeholder)
+            slidesContainer.innerHTML += createSlide4();
+
+            // Slide 5: Most Active
+            slidesContainer.innerHTML += createSlide5(robotsData[1]);
+
+            // Slide 6: Challenge Stats
+            slidesContainer.innerHTML += createSlide6();
+
+            // Set first slide as active
+            const slides = document.querySelectorAll('.slide');
+            if (slides.length > 0) {
+                slides[0].classList.add('active');
+            }
+
+            // Update indicators
+            updateIndicators();
+        }
+
+        function createSlide1(leader) {
+            return `
+                <div class="slide">
+                    <div style="text-align: center;">
+                        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 8px;">⏰ باقي على نهاية التحدي</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" style="width: 62%; background: linear-gradient(90deg, #9370db, #7b68ee);"></div>
+                        </div>
+                        <div class="countdown-display" id="countdown">جاري التحميل...</div>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7); text-align: center; margin-bottom: 10px;">👑 المتصدر الحالي</div>
+                        <div style="font-size: 1.5rem; text-align: center;">${leader.emoji}</div>
+                        <div style="font-size: 1rem; font-weight: 800; text-align: center; color: #ffd700; margin: 8px 0;">ريبوت ${leader.name}</div>
+                        <div style="font-size: 1.5rem; font-weight: 900; text-align: center; color: #00ff88; text-shadow: 0 0 20px rgba(0,255,136,0.5);">+${leader.profit_percent}%</div>
+                        <div style="font-size: 0.75rem; text-align: center; color: rgba(255,255,255,0.5); margin-top: 4px;">${leader.balance.toLocaleString()} ر.س</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createSlide2(leader) {
+            const successRate = Math.round((leader.wins / (leader.wins + leader.losses)) * 100);
+            return `
+                <div class="slide">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem; margin-bottom: 12px;">🥇 المركز الأول</div>
+                        <div class="robot-icon">${leader.emoji}</div>
+                        <div class="robot-name" style="color: #ffd700;">${leader.name}</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-fill" style="width: ${Math.min(leader.profit_percent * 7, 85)}%; background: linear-gradient(90deg, #ffd700, #ffed4e);"></div>
+                        </div>
+                        <div class="profit-display" style="color: #00ff88;">+${leader.profit_percent}%</div>
+                        
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #00ff88;">${leader.wins}</div>
+                                <div class="stat-label">رابحة</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #ff6b6b;">${leader.losses}</div>
+                                <div class="stat-label">خاسرة</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #ffd700;">${successRate}%</div>
+                                <div class="stat-label">نجاح</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createSlide3(top3) {
+            const colors = [
+                { bar: 'linear-gradient(90deg, #ffd700, #ffed4e)', text: '#ffd700', medal: '🥇' },
+                { bar: 'linear-gradient(90deg, #c0c0c0, #e8e8e8)', text: '#c0c0c0', medal: '🥈' },
+                { bar: 'linear-gradient(90deg, #cd7f32, #d4a762)', text: '#cd7f32', medal: '🥉' }
+            ];
+
+            let html = `
+                <div class="slide">
+                    <div style="text-align: center; margin-bottom: 12px;">
+                        <div style="font-size: 1.1rem; font-weight: 700;">🏁 المنافسة الحالية</div>
+                    </div>
+            `;
+
+            top3.forEach((robot, idx) => {
+                const color = colors[idx] || colors[2];
+                html += `
+                    <div style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                            <span style="font-size: 0.8rem;">${color.medal} ${robot.name}</span>
+                            <span style="font-size: 0.9rem; font-weight: 900; color: ${color.text};">+${robot.profit_percent}%</span>
+                        </div>
+                        <div class="progress-bar-container" style="height: 25px;">
+                            <div class="progress-fill" style="width: ${Math.min(robot.profit_percent * 7, 85)}%; background: ${color.bar};"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function createSlide4() {
+            return `
+                <div class="slide">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem; margin-bottom: 20px;">🏆 أفضل صفقة اليوم</div>
+                        <div style="font-size: 3rem; margin: 15px 0;">📈</div>
+                        <div style="font-size: 1.1rem; font-weight: 700; margin-bottom: 8px;">بيع أرامكو</div>
+                        <div style="font-size: 2rem; font-weight: 900; color: #00ff88; margin: 15px 0; text-shadow: 0 0 20px rgba(0,255,136,0.5);">+2,500 ر.س</div>
+                        <div style="font-size: 0.9rem; color: #ffd700; margin-bottom: 8px;">نسبة الربح: +2.1%</div>
+                        <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6);">🤖 بواسطة: صياد الفرص</div>
+                        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 4px;">⏰ منذ 15 دقيقة</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createSlide5(robot) {
+            return `
+                <div class="slide">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem; margin-bottom: 20px;">⚡ الأكثر نشاطاً الآن</div>
+                        <div style="font-size: 3rem; margin: 15px 0;">${robot.emoji}</div>
+                        <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 12px;">${robot.name}</div>
+                        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 15px;">📊 8 صفقات في آخر ساعة</div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">مستوى النشاط</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-fill" style="width: 68%; background: linear-gradient(90deg, #9370db, #7b68ee);"></div>
+                            </div>
+                            <div style="font-size: 1.2rem; font-weight: 900; color: #9370db; margin-top: 8px;">68%</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createSlide6() {
+            const totalTrades = robotsData.reduce((sum, r) => sum + r.wins + r.losses, 0);
+            const totalWins = robotsData.reduce((sum, r) => sum + r.wins, 0);
+            const successRate = Math.round((totalWins / totalTrades) * 100);
+
+            return `
+                <div class="slide">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.2rem; margin-bottom: 20px;">📊 إحصائيات التحدي</div>
+                        
+                        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 20px 0;">
+                            <div class="stat-item" style="padding: 15px;">
+                                <div class="stat-value" style="color: #ffd700; font-size: 1.5rem;">${totalTrades}</div>
+                                <div class="stat-label" style="font-size: 0.7rem;">صفقة منفذة</div>
+                            </div>
+                            <div class="stat-item" style="padding: 15px;">
+                                <div class="stat-value" style="color: #00ff88; font-size: 1.5rem;">${successRate}%</div>
+                                <div class="stat-label" style="font-size: 0.7rem;">نسبة النجاح</div>
+                            </div>
+                            <div class="stat-item" style="padding: 15px;">
+                                <div class="stat-value" style="color: #00d4ff; font-size: 1.5rem;">+1.2%</div>
+                                <div class="stat-label" style="font-size: 0.7rem;">ارتفاع السوق</div>
+                            </div>
+                            <div class="stat-item" style="padding: 15px;">
+                                <div class="stat-value" style="color: #9370db; font-size: 1.5rem;">${robotsData.length}</div>
+                                <div class="stat-label" style="font-size: 0.7rem;">روبوتات نشطة</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px;">
+                            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-bottom: 8px;">⏰ الوقت المتبقي</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-fill" style="width: 62%; background: linear-gradient(90deg, #9370db, #7b68ee);"></div>
+                            </div>
+                            <div style="font-size: 0.9rem; font-weight: 700; color: #9370db; margin-top: 8px;" id="countdownBottom">جاري التحميل...</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateIndicators() {
+            const indicatorsContainer = document.getElementById('indicators');
+            indicatorsContainer.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const indicator = document.createElement('div');
+                indicator.className = i === 0 ? 'indicator active' : 'indicator inactive';
+                indicator.addEventListener('click', () => {
+                    currentSlide = i;
+                    showSlide(currentSlide);
+                });
+                indicatorsContainer.appendChild(indicator);
+            }
+        }
+
+        // Carousel Logic
+        function showSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const indicators = document.querySelectorAll('.indicator');
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(ind => {
+                ind.classList.remove('active');
+                ind.classList.add('inactive');
+            });
+
+            if (slides[index]) {
+                slides[index].classList.add('active');
+            }
+            if (indicators[index]) {
+                indicators[index].classList.remove('inactive');
+                indicators[index].classList.add('active');
+            }
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % 6;
+            showSlide(currentSlide);
+        }
+
+        // Auto-advance every 5 seconds
+        setInterval(nextSlide, 5000);
+
+        // Countdown Timer
+        function updateCountdown() {
+            // You can set the actual end date here
+            const now = new Date();
+            const endDate = new Date(now.getTime() + (3 * 24 * 60 * 60 * 1000) + (7 * 60 * 60 * 1000));
+
+            const diff = endDate - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+            const countdownText = `${days} أيام و ${hours} ساعات`;
+            const countdownEl = document.getElementById('countdown');
+            const countdownBottomEl = document.getElementById('countdownBottom');
+
+            if (countdownEl) countdownEl.textContent = countdownText;
+            if (countdownBottomEl) countdownBottomEl.textContent = countdownText;
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 60000);
+
+        // Rotating Phrases
+        const phrases = document.querySelectorAll('.phrase');
+        let currentPhrase = 0;
+
+        function rotatePhrase() {
+            phrases.forEach(p => p.classList.remove('active'));
+            currentPhrase = (currentPhrase + 1) % phrases.length;
+            phrases[currentPhrase].classList.add('active');
+        }
+
+        setInterval(rotatePhrase, 4000);
+
+        // Stock Ticker
+        const tickerStocks = [
+            { symbol: 'أرامكو', price: '28.50', change: '+1.2%', up: true },
+            { symbol: 'الراجحي', price: '87.30', change: '+2.1%', up: true },
+            { symbol: 'سابك', price: '92.40', change: '-0.5%', up: false },
+            { symbol: 'الإنماء', price: '16.80', change: '+0.8%', up: true },
+            { symbol: 'المراعي', price: '65.20', change: '+1.5%', up: true },
+            { symbol: 'STC', price: '45.60', change: '-0.3%', up: false },
+            { symbol: 'كيان', price: '19.70', change: '+2.3%', up: true },
+            { symbol: 'الأهلي', price: '34.90', change: '+0.9%', up: true }
+        ];
+
+        function createTickerTrack() {
+            const tickerTrack = document.getElementById('tickerTrack');
+            const duplicatedStocks = [...tickerStocks, ...tickerStocks];
+
+            duplicatedStocks.forEach(stock => {
+                const item = document.createElement('div');
+                item.className = 'ticker-item';
+                item.innerHTML = `
+                    <span class="ticker-symbol">${stock.symbol}</span>
+                    <span class="ticker-price">${stock.price}</span>
+                    <span class="ticker-change ${stock.up ? 'up' : 'down'}">${stock.change}</span>
+                `;
+                tickerTrack.appendChild(item);
+            });
+        }
+
+        createTickerTrack();
+
+        // News Updates
+        function updateNewsFromData() {
+            if (robotsData.length === 0) return;
+
+            const newsContainer = document.getElementById('newsContainer');
+            const newsTitle = newsContainer.querySelector('.news-title');
+
+            // Clear existing news except title
+            newsContainer.innerHTML = '';
+            newsContainer.appendChild(newsTitle);
+
+            // Add initial news from robot data
+            const topRobots = robotsData.slice(0, 3);
+            topRobots.forEach((robot, idx) => {
+                const newsItem = document.createElement('div');
+                newsItem.className = 'news-item';
+                const icons = ['✅', '📊', '⚡'];
+                const texts = ['صفقة رابحة', 'تحليل جديد', 'قرار سريع'];
+                newsItem.innerHTML = `
+                    <span class="news-icon">${icons[idx]}</span>
+                    <span class="news-text">${texts[idx]}: ${robot.name} (+${robot.profit_percent}%)</span>
+                    <span class="news-time">الآن</span>
+                `;
+                newsContainer.appendChild(newsItem);
+            });
+        }
+
+        // Simulate news updates
+        const newsTypes = [
+            { icon: '✅', text: 'صفقة رابحة' },
+            { icon: '📊', text: 'تحليل جديد' },
+            { icon: '⚡', text: 'قرار سريع' },
+            { icon: '📰', text: 'خبر اقتصادي' }
+        ];
+
+        function addNewsItem() {
+            if (robotsData.length === 0) return;
+
+            const newsContainer = document.getElementById('newsContainer');
+            const news = newsTypes[Math.floor(Math.random() * newsTypes.length)];
+            const robot = robotsData[Math.floor(Math.random() * robotsData.length)];
+
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item';
+            newsItem.innerHTML = `
+                <span class="news-icon">${news.icon}</span>
+                <span class="news-text">${news.text}: ${robot.name}</span>
+                <span class="news-time">الآن</span>
+            `;
+
+            // Update existing times
+            const timeElements = newsContainer.querySelectorAll('.news-time');
+            timeElements.forEach((el, idx) => {
+                if (idx > 0) {
+                    const currentTime = parseInt(el.textContent) || 0;
+                    el.textContent = (currentTime + 1) + ' د';
+                }
+            });
+
+            newsContainer.insertBefore(newsItem, newsContainer.children[1]);
+
+            // Keep only last 3 news items
+            const items = newsContainer.querySelectorAll('.news-item');
+            if (items.length > 3) {
+                items[items.length - 1].remove();
+            }
+        }
+
+        setInterval(addNewsItem, 8000);
+    </script>
+</body>
+
+</html>

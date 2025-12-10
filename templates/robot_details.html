@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الروبوت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            color: #fff;
+        }
+
+        .page-container {
+            max-width: 393px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 12px 12px 80px 12px;
+        }
+
+        .back-btn {
+            color: #ffd700;
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            display: inline-block;
+        }
+
+        .robot-hero {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
+
+        .robot-emoji {
+            font-size: 4rem;
+            margin-bottom: 12px;
+        }
+
+        .robot-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .robot-strategy {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 16px;
+        }
+
+        .robot-bio {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.6;
+            font-style: italic;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+        }
+
+        .stats-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 12px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .stat-box {
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.positive {
+            color: #00ff88;
+        }
+
+        .stat-value.negative {
+            color: #ff6b6b;
+        }
+
+        .stat-value.neutral {
+            color: #ffd700;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .copy-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #000;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 393px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .nav-item.center {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            transform: scale(1.15);
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item.center .nav-icon {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <a href="/robots" class="back-btn">← العودة للروبوتات</a>
+
+        <div class="robot-hero">
+            <div class="robot-emoji" id="robotEmoji">🤖</div>
+            <div class="robot-name" id="robotName">جاري التحميل...</div>
+            <div class="robot-strategy" id="robotStrategy"></div>
+            <div class="robot-bio" id="robotBio"></div>
+            <div style="margin-top: 12px;" id="robotRisk"></div>
+        </div>
+
+        <div class="stats-section">
+            <div class="section-title">📊 الأداء الحالي</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-value positive" id="profitValue">+0%</div>
+                    <div class="stat-label">الربح/الخسارة</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value neutral" id="tradesValue">0</div>
+                    <div class="stat-label">عدد الصفقات</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value neutral" id="successValue">0%</div>
+                    <div class="stat-label">نسبة النجاح</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value neutral" id="rankValue">-</div>
+                    <div class="stat-label">الترتيب</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="copy-btn" onclick="copyRobot()">نسخ هذا الروبوت</button>
+    </div>
+
+    <nav class="bottom-nav">
+        <a href="/trades" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <div>الصفقات</div>
+        </a>
+        <a href="/portfolio" class="nav-item">
+            <div class="nav-icon">💼</div>
+            <div>المحفظة</div>
+        </a>
+        <a href="/robots" class="nav-item center">
+            <div class="nav-icon">🤖</div>
+            <div>الروبوتات</div>
+        </a>
+        <a href="/reporter" class="nav-item">
+            <div class="nav-icon">📰</div>
+            <div>الراصد</div>
+        </a>
+        <a href="/more" class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div>المزيد</div>
+        </a>
+    </nav>
+
+    <script>
+        const robotId = window.location.pathname.split('/').pop();
+
+        async function loadRobotDetails() {
+            try {
+                const response = await fetch('/api/robots');
+                if (!response.ok) throw new Error('Failed to fetch');
+
+                const robots = await response.json();
+                const robot = robots.find(r => r.id === robotId);
+
+                if (!robot) {
+                    document.getElementById('robotName').textContent = 'روبوت غير موجود';
+                    return;
+                }
+
+                // Display robot info
+                document.getElementById('robotEmoji').textContent = robot.emoji;
+                document.getElementById('robotName').textContent = `ريبوت ${robot.name}`;
+                document.getElementById('robotStrategy').textContent = robot.strategy;
+                document.getElementById('robotBio').textContent = `"${robot.bio}"`;
+
+                // Risk badge
+                const riskColor = robot.risk.includes('عالي') ? '#ff6b6b' :
+                    robot.risk.includes('متوسط') ? '#ffaa00' : '#00ff88';
+                document.getElementById('robotRisk').innerHTML =
+                    `<span class="risk-badge" style="background: ${riskColor}33; color: ${riskColor}; border: 1px solid ${riskColor};">${robot.risk}</span>`;
+
+                // Stats
+                const profitClass = robot.profit_percent >= 0 ? 'positive' : 'negative';
+                document.getElementById('profitValue').className = `stat-value ${profitClass}`;
+                document.getElementById('profitValue').textContent =
+                    `${robot.profit_percent >= 0 ? '+' : ''}${robot.profit_percent}%`;
+
+                document.getElementById('tradesValue').textContent = robot.trades;
+                document.getElementById('successValue').textContent = `${robot.success_rate}%`;
+
+                // Calculate rank
+                const sortedRobots = robots.sort((a, b) => b.profit_percent - a.profit_percent);
+                const rank = sortedRobots.findIndex(r => r.id === robotId) + 1;
+                document.getElementById('rankValue').textContent = `#${rank}`;
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('robotName').textContent = 'خطأ في التحميل';
+            }
+        }
+
+        function copyRobot() {
+            window.location.href = `/robots?copy=${robotId}`;
+        }
+
+        loadRobotDetails();
+    </script>
+</body>
+
+</html>

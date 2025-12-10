@@ -1,0 +1,42 @@
+{
+  "default_user": {
+    "user_id": "default_user",
+    "total_balance": 20000,
+    "current_value": 20000,
+    "total_profit": 0,
+    "profit_percent": 0,
+    "copied_robots": [
+      {
+        "robot_id": "Bot-1",
+        "robot_name": "المغامر",
+        "emoji": "🎲",
+        "allocated_balance": 10000,
+        "current_balance": 10000,
+        "profit": 0,
+        "profit_percent": 0,
+        "active_trades": 0,
+        "total_trades": 0,
+        "success_rate": 0,
+        "is_active": true,
+        "copied_at": "2025-12-10T15:54:52.876577"
+      },
+      {
+        "robot_id": "Bot-2",
+        "robot_name": "صياد الترند",
+        "emoji": "🤖",
+        "allocated_balance": 10000,
+        "current_balance": 10000,
+        "profit": 0,
+        "profit_percent": 0,
+        "active_trades": 0,
+        "total_trades": 0,
+        "success_rate": 0,
+        "is_active": true,
+        "copied_at": "2025-12-10T15:55:20.798534"
+      }
+    ],
+    "active_trades": 0,
+    "completed_trades": 0,
+    "success_rate": 0
+  }
+}

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البث المباشر - المتداول الذكي</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            padding-bottom: 70px;
+            background: #000;
+            color: #fff;
+        }
+
+        .live-header {
+            padding: 15px;
+            background: #111;
+            border-bottom: 2px solid var(--accent-gold);
+            text-align: center;
+        }
+
+        .live-stats {
+            display: flex;
+            justify-content: space-around;
+            background: #222;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .live-feed-item {
+            background: #1c1c1e;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            border-right: 3px solid #ccc;
+            animation: fadeIn 0.5s;
+        }
+
+        .feed-buy {
+            border-color: #4cd964;
+        }
+
+        .feed-sell {
+            border-color: #ff3b30;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="live-header">
+        <h1 style="margin:0; font-size:1.2rem; color:var(--accent-gold);">🔴 بث مباشر: تحدي العمالقة</h1>
+        <small style="color:#888;">جاري الاتصال بالسوق...</small>
+    </div>
+
+    <!-- Leaderboard Top 3 -->
+    <div class="live-stats" id="mobile-leaderboard">
+        <!-- Injected via JS -->
+        <div>انتظر...</div>
+    </div>
+
+    <!-- Live Event Feed -->
+    <div id="action-feed" style="overflow-y:auto; height: calc(100vh - 250px);">
+        <!-- Events Injected via JS -->
+    </div>
+
+    <!-- Sticky Nav -->
+    <nav class="nav-bar">
+        <div class="nav-item" onclick="window.location.href='/app'">🏠 العودة</div>
+        <div class="nav-item active">🎥 البث</div>
+    </nav>
+
+    <script src="/static/js/broadcast.js"></script>
+    <script>
+        // Override broadcast.js display functions for mobile if needed
+        // Assuming broadcast.js populates #action-feed and #leaderboard
+        // We might need to adjust logic if IDs differ. 
+        // broadcast.html uses #leaderboard (aside), here we use #mobile-leaderboard. 
+        // I will add a small adapter script here.
+
+        const originalRenderStats = window.renderLeaderboard;
+        // Wait for broadcast.js to load? It runs on window.onload usually.
+
+        // Simple polling to update mobile-specific leaderboard if broadcast.js doesn't target it
+        setInterval(() => {
+            fetch('/api/status').then(r => r.json()).then(data => {
+                const lb = document.getElementById('mobile-leaderboard');
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    const top3 = data.leaderboard.slice(0, 3);
+                    lb.innerHTML = top3.map((b, i) => `
+                        <div style="text-align:center;">
+                            <div style="font-size:1.5rem;">${i == 0 ? '🥇' : (i == 1 ? '🥈' : '🥉')}</div>
+                            <div style="font-size:0.8rem;">${b.name.split(' ')[0]}</div>
+                            <div style="color:${b.score >= 0 ? '#4cd964' : '#ff3b30'}; font-weight:bold;">${b.score.toFixed(0)}</div>
+                        </div>
+                   `).join('');
+                }
+            });
+        }, 3000);
+    </script>
+</body>
+
+</html>

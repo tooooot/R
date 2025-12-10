@@ -1,0 +1,61 @@
+[
+  {
+    "title": "مؤشر تاسي يغلق على ارتفاع طفيف بدعم من البنوك",
+    "source": "Argaam",
+    "related_symbols": [
+      "1120",
+      "1180"
+    ],
+    "sentiment": "Neutral",
+    "score": 0.3,
+    "recommendation": "BUY (شراء) 🟢",
+    "timestamp": "2025-12-10T00:51:09.384535",
+    "id": "3aaa9764a428ec0e6f5ca588cf378acd"
+  },
+  {
+    "title": "سابك تعلن عن نتائج مالية تفوق التوقعات للربع الثالث",
+    "source": "Maaaal",
+    "related_symbols": [
+      "2010"
+    ],
+    "sentiment": "Neutral",
+    "score": 0,
+    "recommendation": "NEUTRAL (محايد) ⚪",
+    "timestamp": "2025-12-10T00:50:09.377447",
+    "id": "80135b152968a82e87bcd9a393f4887a"
+  },
+  {
+    "title": "الاتصالات السعودية STC توقع عقد شراكة مع مايكروسوفت",
+    "source": "CMA",
+    "related_symbols": [
+      "7010"
+    ],
+    "sentiment": "Neutral",
+    "score": 0,
+    "recommendation": "NEUTRAL (محايد) ⚪",
+    "timestamp": "2025-12-10T00:48:39.371900",
+    "id": "e7e170b24acf92a88e3ffad6a7368b4e"
+  },
+  {
+    "title": "هبوط مفاجئ في قطاع الأسمنت بسبب ضعف الطلب",
+    "source": "Reuters",
+    "related_symbols": [],
+    "sentiment": "Neutral",
+    "score": -0.3,
+    "recommendation": "SELL (بيع) 🔴",
+    "timestamp": "2025-12-10T00:46:17.984893",
+    "id": "315d61c1ee5f6a0fa87b7335258061a6"
+  },
+  {
+    "title": "أرامكو توزع أرباح نقدية بقيمة 0.45 ريال للسهم",
+    "source": "Argaam",
+    "related_symbols": [
+      "2222"
+    ],
+    "sentiment": "Neutral",
+    "score": 0.3,
+    "recommendation": "BUY (شراء) 🟢",
+    "timestamp": "2025-12-10T00:46:09.028683",
+    "id": "39a6f5a1fc2798849ebbd1064032d7b1"
+  }
+]

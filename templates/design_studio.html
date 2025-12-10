@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>استوديو التصميم الفاخر | Design Studio</title>
+    <style>
+        body {
+            background: #111;
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #fff;
+        }
+
+        /* Header / Controls */
+        .controls {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-bottom: 2px solid #D4AF37;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        select {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            border-radius: 5px;
+            background: #222;
+            color: #D4AF37;
+            border: 1px solid #D4AF37;
+        }
+
+        /* Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px;
+            justify-items: center;
+        }
+
+        /* iPhone Mockup */
+        .iphone-frame {
+            width: 320px;
+            height: 650px;
+            border: 12px solid #333;
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            background: #000;
+            box-shadow: 0 0 0 2px #444, 0 20px 50px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s;
+        }
+
+        .iphone-frame:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(212, 175, 55, 0.2);
+            border-color: #444;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            scrollbar-width: none;
+        }
+
+        /* Dynamic Variant Labels */
+        .variant-label {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.7);
+            color: #ddd;
+            font-size: 0.8rem;
+            padding: 5px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="controls">
+        <h1 style="margin:0; color:#D4AF37;">💎 Design Gallery</h1>
+        <div>
+            <label>اختر الصفحة:</label>
+            <select id="page-selector" onchange="renderGallery()">
+                <option value="/app">الرئيسية (App Home)</option>
+                <option value="/live/mobile">البث المباشر (Live)</option>
+                <option value="/news">مركز الأخبار (News)</option>
+                <option value="/charts">مركز الشارتات (Charts)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="gallery" id="gallery-grid">
+        <!-- 12 iPhones injected here -->
+    </div>
+
+    <script>
+        // Design Configurations (Luxury/Majestic)
+        const variants = [
+            { name: "Royal Gold (Original)", colors: { "--accent-gold": "#D4AF37", "--bg-dark": "#000000" } },
+            { name: "Platinum Elite", colors: { "--accent-gold": "#E5E4E2", "--bg-dark": "#1a1a1a", "color": "#E5E4E2" }, filter: "contrast(1.1) grayscale(0.2)" },
+            { name: "Cyber Midnight", colors: { "--accent-gold": "#00f3ff", "--bg-dark": "#050510" }, filter: "hue-rotate(180deg)" },
+            { name: "Emerald Empire", colors: { "--accent-gold": "#50C878", "--bg-dark": "#001a0d" }, filter: "hue-rotate(90deg)" },
+            { name: "Crimson King", colors: { "--accent-gold": "#DC143C", "--bg-dark": "#1a0000" }, filter: "sepia(0.5) hue-rotate(-50deg)" },
+            { name: "Obsidian Void", colors: { "--accent-gold": "#333333", "--bg-dark": "#000000" }, filter: "grayscale(1) contrast(1.5)" },
+
+            // Layout Experiments
+            { name: "Inverted Layout", layout: "reverse" },
+            { name: "Compact Minimalist", layout: "compact" },
+            { name: "Showcase Centric", layout: "poster" },
+            { name: "Glassmorphism", style: "glass" },
+            { name: "Neon Flux", style: "neon" },
+            { name: "Experimental Chaost", layout: "shuffle" }
+        ];
+
+        function renderGallery() {
+            const grid = document.getElementById('gallery-grid');
+            const url = document.getElementById('page-selector').value;
+            grid.innerHTML = '';
+
+            variants.forEach((v, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = `
+                    <div class="iphone-frame">
+                        <iframe src="${url}" onload="applyVariant(this, ${index})"></iframe>
+                        <div class="variant-label">${v.name}</div>
+                    </div>
+                `;
+                grid.appendChild(wrapper);
+            });
+        }
+
+        function applyVariant(iframe, index) {
+            const config = variants[index];
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            const body = doc.body;
+
+            // 1. Color Overrides (Simple CSS Vars)
+            if (config.colors) {
+                Object.keys(config.colors).forEach(key => {
+                    body.style.setProperty(key, config.colors[key]);
+                });
+            }
+
+            // 2. Filters (Global CSS)
+            if (config.filter) {
+                body.style.filter = config.filter;
+            }
+
+            // 3. Layout Manipulation (DOM Reorder)
+            if (config.layout) {
+                if (config.layout === 'reverse') {
+                    // Try to find main container and reverse children
+                    const main = doc.querySelector('#home-view') || doc.body;
+                    const children = Array.from(main.children);
+                    children.reverse().forEach(c => main.appendChild(c));
+                }
+                if (config.layout === 'shuffle') {
+                    const main = doc.querySelector('#home-view') || doc.body;
+                    const children = Array.from(main.children);
+                    for (let i = children.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [children[i], children[j]] = [children[j], children[i]];
+                    }
+                    children.forEach(c => main.appendChild(c));
+                }
+                if (config.layout === 'compact') {
+                    doc.querySelectorAll('.bot-card, .news-card, .rec-card').forEach(el => {
+                        el.style.padding = "5px"; margin = "2px";
+                        el.style.fontSize = "0.8rem";
+                    });
+                }
+            }
+
+            // 4. Styles (Inject CSS)
+            if (config.style) {
+                if (config.style === 'glass') {
+                    const style = doc.createElement('style');
+                    style.innerHTML = `
+                        .bot-card, .rec-card, .news-card, .nav-item {
+                            background: rgba(255,255,255,0.1) !important;
+                            backdrop-filter: blur(10px);
+                            border: 1px solid rgba(255,255,255,0.2) !important;
+                        }
+                     `;
+                    doc.head.appendChild(style);
+                }
+                if (config.style === 'neon') {
+                    const style = doc.createElement('style');
+                    style.innerHTML = `
+                        * { text-shadow: 0 0 5px currentColor; }
+                        div { box-shadow: 0 0 10px var(--accent-gold); }
+                     `;
+                    doc.head.appendChild(style);
+                }
+            }
+        }
+
+        // Init
+        renderGallery();
+    </script>
+</body>
+
+</html>

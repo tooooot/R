@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز الأخبار</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            color: #fff;
+        }
+
+        .page-container {
+            max-width: 393px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 12px 12px 80px 12px;
+        }
+
+        .header {
+            padding: 16px 0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 4px;
+        }
+
+        /* جدول الأسهم */
+        .stocks-table-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+        }
+
+        .section-header {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stocks-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stocks-table th {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .stocks-table td {
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.8rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stocks-table tr:hover {
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .stock-name {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .news-count {
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .news-count.positive {
+            color: #00ff88;
+        }
+
+        .news-count.negative {
+            color: #ff6b6b;
+        }
+
+        .news-count.neutral {
+            color: #ffd700;
+        }
+
+        .recommendation-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .rec-buy-strong {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+
+        .rec-buy {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.5);
+        }
+
+        .rec-neutral {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        .rec-sell {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            border: 1px solid rgba(255, 107, 107, 0.5);
+        }
+
+        .rec-sell-strong {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        /* تبويبات المصادر */
+        .sources-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ffd700;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            border-color: #ffd700;
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* جدول الأخبار */
+        .news-table-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .news-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .news-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .news-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .news-stock {
+            font-size: 0.75rem;
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        .news-time {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .news-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .news-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sentiment-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .sentiment-positive {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+        }
+
+        .sentiment-negative {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+
+        .sentiment-neutral {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .confidence-text {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 393px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .nav-item.center {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            transform: scale(1.15);
+            font-weight: 800;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item.center .nav-icon {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📊 مركز الأخبار</h1>
+            <p>تحليل المشاعر بالذكاء الاصطناعي</p>
+        </div>
+
+        <!-- جدول الأسهم -->
+        <div class="stocks-table-container">
+            <div class="section-header">
+                <span>📈</span>
+                <span>ملخص الأسهم</span>
+            </div>
+            <table class="stocks-table">
+                <thead>
+                    <tr>
+                        <th>السهم</th>
+                        <th>إيجابي</th>
+                        <th>سلبي</th>
+                        <th>محايد</th>
+                        <th>التوصية</th>
+                    </tr>
+                </thead>
+                <tbody id="stocksTableBody">
+                    <tr>
+                        <td colspan="5" class="loading">جاري التحميل...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- تبويبات المصادر -->
+        <div class="sources-tabs">
+            <button class="tab-btn active" data-source="all">الكل</button>
+            <button class="tab-btn" data-source="argaam">أرقام</button>
+            <button class="tab-btn" data-source="mubasher">مباشر</button>
+            <button class="tab-btn" data-source="tadawul">تداول</button>
+            <button class="tab-btn" data-source="general">عامة</button>
+        </div>
+
+        <!-- جدول الأخبار -->
+        <div class="news-table-container">
+            <div class="section-header">
+                <span>📰</span>
+                <span id="newsSourceTitle">جميع الأخبار</span>
+            </div>
+            <div class="news-list" id="newsList">
+                <div class="loading">جاري تحميل الأخبار...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="/trades" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <div>الصفقات</div>
+        </a>
+        <a href="/portfolio" class="nav-item">
+            <div class="nav-icon">💼</div>
+            <div>المحفظة</div>
+        </a>
+        <a href="/robots" class="nav-item center">
+            <div class="nav-icon">🤖</div>
+            <div>الروبوتات</div>
+        </a>
+        <a href="/reporter" class="nav-item">
+            <div class="nav-icon">📰</div>
+            <div>الراصد</div>
+        </a>
+        <a href="/more" class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div>المزيد</div>
+        </a>
+    </nav>
+
+    <script>
+        let allNewsData = {};
+        let currentSource = 'all';
+
+        // تحميل البيانات
+        async function loadData() {
+            try {
+                const response = await fetch('/api/news/analyzed');
+                if (!response.ok) throw new Error('Failed');
+
+                const data = await response.json();
+                allNewsData = data;
+
+                displayStocksTable(data.stocks_summary);
+                displayNews(currentSource);
+            } catch (error) {
+                console.error('Error:', error);
+                loadDemoData();
+            }
+        }
+
+        // عرض جدول الأسهم
+        function displayStocksTable(stocksSummary) {
+            const tbody = document.getElementById('stocksTableBody');
+
+            if (!stocksSummary || Object.keys(stocksSummary).length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5">لا توجد بيانات</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = Object.entries(stocksSummary).map(([stock, data]) => {
+                const recClass = getRecommendationClass(data.recommendation);
+                return `
+                    <tr>
+                        <td class="stock-name">${data.stock_name || stock}</td>
+                        <td class="news-count positive">${data.positive_count}</td>
+                        <td class="news-count negative">${data.negative_count}</td>
+                        <td class="news-count neutral">${data.neutral_count}</td>
+                        <td><span class="recommendation-badge ${recClass}">${data.recommendation}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // عرض الأخبار حسب المصدر
+        function displayNews(source) {
+            const newsList = document.getElementById('newsList');
+            const sourceTitle = document.getElementById('newsSourceTitle');
+
+            let newsToShow = [];
+
+            if (source === 'all') {
+                sourceTitle.textContent = 'جميع الأخبار';
+                newsToShow = allNewsData.all_news || [];
+            } else {
+                const sourceTitles = {
+                    'argaam': 'أخبار أرقام',
+                    'mubasher': 'أخبار مباشر',
+                    'tadawul': 'أخبار تداول',
+                    'general': 'أخبار عامة'
+                };
+                sourceTitle.textContent = sourceTitles[source] || 'الأخبار';
+                newsToShow = (allNewsData.by_source && allNewsData.by_source[source]) || [];
+            }
+
+            if (newsToShow.length === 0) {
+                newsList.innerHTML = '<div class="loading">لا توجد أخبار في هذا المصدر</div>';
+                return;
+            }
+
+            newsList.innerHTML = newsToShow.map(news => {
+                const sentimentClass = `sentiment-${news.sentiment}`;
+                const sentimentLabel = getSentimentLabel(news.sentiment);
+                const timeAgo = formatTimeAgo(news.timestamp);
+
+                return `
+                    <div class="news-card">
+                        <div class="news-card-header">
+                            <span class="news-stock">${news.stock_name || news.stock}</span>
+                            <span class="news-time">${timeAgo}</span>
+                        </div>
+                        <div class="news-title">${news.title}</div>
+                        <div class="news-footer">
+                            <span class="sentiment-badge ${sentimentClass}">${sentimentLabel}</span>
+                            <span class="confidence-text">الثقة: ${news.confidence}%</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // تبديل التبويبات
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentSource = btn.dataset.source;
+                displayNews(currentSource);
+            });
+        });
+
+        // Helper Functions
+        function getRecommendationClass(recommendation) {
+            if (recommendation.includes('شراء قوي')) return 'rec-buy-strong';
+            if (recommendation.includes('شراء')) return 'rec-buy';
+            if (recommendation.includes('بيع قوي')) return 'rec-sell-strong';
+            if (recommendation.includes('بيع')) return 'rec-sell';
+            return 'rec-neutral';
+        }
+
+        function getSentimentLabel(sentiment) {
+            const labels = {
+                'positive': '✅ إيجابي',
+                'negative': '❌ سلبي',
+                'neutral': '⚪ محايد'
+            };
+            return labels[sentiment] || sentiment;
+        }
+
+        function formatTimeAgo(timestamp) {
+            if (!timestamp) return 'الآن';
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000 / 60);
+
+            if (diff < 1) return 'الآن';
+            if (diff < 60) return `منذ ${diff} د`;
+            if (diff < 1440) return `منذ ${Math.floor(diff / 60)} ساعة`;
+            return `منذ ${Math.floor(diff / 1440)} يوم`;
+        }
+
+        function loadDemoData() {
+            // بيانات تجريبية
+            allNewsData = {
+                stocks_summary: {
+                    '2222': {
+                        stock_name: 'أرامكو',
+                        positive_count: 5,
+                        negative_count: 1,
+                        neutral_count: 2,
+                        recommendation: 'شراء قوي 🟢'
+                    },
+                    '1120': {
+                        stock_name: 'الراجحي',
+                        positive_count: 3,
+                        negative_count: 2,
+                        neutral_count: 1,
+                        recommendation: 'شراء 🟢'
+                    },
+                    '2010': {
+                        stock_name: 'سابك',
+                        positive_count: 1,
+                        negative_count: 4,
+                        neutral_count: 1,
+                        recommendation: 'بيع 🔴'
+                    }
+                },
+                all_news: [
+                    {
+                        title: 'أرامكو السعودية تعلن عن أرباح قياسية',
+                        stock: '2222',
+                        stock_name: 'أرامكو',
+                        sentiment: 'positive',
+                        confidence: 92,
+                        timestamp: new Date().toISOString(),
+                        source: 'أرقام'
+                    },
+                    {
+                        title: 'سابك تواجه تحديات في السوق العالمية',
+                        stock: '2010',
+                        stock_name: 'سابك',
+                        sentiment: 'negative',
+                        confidence: 85,
+                        timestamp: new Date(Date.now() - 3600000).toISOString(),
+                        source: 'مباشر'
+                    }
+                ],
+                by_source: {
+                    'argaam': [],
+                    'mubasher': [],
+                    'tadawul': [],
+                    'general': []
+                }
+            };
+
+            displayStocksTable(allNewsData.stocks_summary);
+            displayNews('all');
+        }
+
+        // بدء التحميل
+        loadData();
+    </script>
+</body>
+
+</html>
