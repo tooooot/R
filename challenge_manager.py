@@ -17,9 +17,12 @@ class ChallengeManager:
         self.end_date = today + datetime.timedelta(days=5) # 5 Trading days
         self.is_active = True
         
-        # Reset scores
-        for bot_id in range(1, 11):
-            self.bot_scores[f"Bot-{bot_id}"] = {"pnl": 0.0, "trades": 0, "wins": 0, "status": "ACTIVE"}
+        # Reset scores - Use actual bot IDs from strategies.py
+        bot_ids = ["hunter", "analyst", "lightning", "sniper", "mastermind", 
+                   "brave", "guardian", "wave", "striker", "jewel"]
+        
+        for bot_id in bot_ids:
+            self.bot_scores[bot_id] = {"pnl": 0.0, "trades": 0, "wins": 0, "status": "ACTIVE"}
             
         print(f"Challenge Started: {self.start_date} to {self.end_date}")
 

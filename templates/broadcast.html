@@ -492,25 +492,8 @@
                 }
             } catch (error) {
                 console.error('Error fetching robots data:', error);
-                // Use fallback data
-                useFallbackData();
+                // No fallback data - keep screen clean or show error state
             }
-        }
-
-        // Fallback data if API is not available
-        function useFallbackData() {
-            robotsData = [
-                { name: 'صياد الفرص', emoji: '🤖', balance: 112500, profit_percent: 12.5, wins: 15, losses: 3 },
-                { name: 'المحلل الذكي', emoji: '🦾', balance: 108200, profit_percent: 8.2, wins: 14, losses: 4 },
-                { name: 'البرق السريع', emoji: '⚡', balance: 106800, profit_percent: 6.8, wins: 13, losses: 5 },
-                { name: 'القناص', emoji: '🎯', balance: 105200, profit_percent: 5.2, wins: 12, losses: 6 },
-                { name: 'العقل المدبر', emoji: '🧠', balance: 103500, profit_percent: 3.5, wins: 11, losses: 7 },
-                { name: 'الجريء', emoji: '🔥', balance: 101800, profit_percent: 1.8, wins: 10, losses: 8 },
-                { name: 'الحارس', emoji: '🛡️', balance: 100500, profit_percent: 0.5, wins: 9, losses: 9 },
-                { name: 'الموجة', emoji: '🌊', balance: 98200, profit_percent: -1.8, wins: 8, losses: 10 }
-            ];
-            updateCarousel();
-            updateNewsFromData();
         }
 
         // Initialize - fetch data

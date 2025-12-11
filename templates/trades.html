@@ -226,52 +226,43 @@
         </div>
 
         <div class="trades-list" id="tradesList">
-            <!-- Sample trades -->
+            {% if trades %}
+            {% for trade in trades %}
             <div class="trade-card">
                 <div class="trade-header">
-                    <div class="trade-stock">📈 أرامكو (2222)</div>
-                    <div class="trade-status active">نشطة</div>
-                </div>
-                <div class="trade-robot">🤖 صياد الفرص</div>
-                <div class="trade-details">
-                    <div class="detail-item">
-                        <div class="detail-label">الدخول</div>
-                        <div class="detail-value">28.50</div>
+                    <div class="trade-stock">
+                        {% if trade.type == 'BUY' %}📈{% else %}📉{% endif %}
+                        {{ trade.symbol }}
                     </div>
-                    <div class="detail-item">
-                        <div class="detail-label">الحالي</div>
-                        <div class="detail-value">29.20</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">الربح</div>
-                        <div class="detail-value profit positive">+2.5%</div>
-                    </div>
-                </div>
-                <button class="view-details-btn" onclick="viewDetails('trade1')">عرض التفاصيل</button>
-            </div>
-
-            <div class="trade-card">
-                <div class="trade-header">
-                    <div class="trade-stock">📊 الراجحي (1120)</div>
                     <div class="trade-status completed">مكتملة</div>
                 </div>
-                <div class="trade-robot">🦾 المحلل الذكي</div>
+                <div class="trade-robot">🤖 {{ trade.bot_name }}</div>
                 <div class="trade-details">
                     <div class="detail-item">
-                        <div class="detail-label">الدخول</div>
-                        <div class="detail-value">87.00</div>
+                        <div class="detail-label">النوع</div>
+                        <div class="detail-value"
+                            style="color: {% if trade.type == 'BUY' %}#00ff88{% else %}#ff6b6b{% endif %}">
+                            {% if trade.type == 'BUY' %}شراء{% else %}بيع{% endif %}
+                        </div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">الخروج</div>
-                        <div class="detail-value">88.50</div>
+                        <div class="detail-label">السعر</div>
+                        <div class="detail-value">{{ "%.2f"|format(trade.price) }}</div>
                     </div>
                     <div class="detail-item">
-                        <div class="detail-label">الربح</div>
-                        <div class="detail-value profit positive">+1.7%</div>
+                        <div class="detail-label">الوقت</div>
+                        <div class="detail-value">{{ trade.time }}</div>
                     </div>
                 </div>
-                <button class="view-details-btn" onclick="viewDetails('trade2')">عرض التفاصيل</button>
+                <button class="view-details-btn" onclick="viewDetails('{{ trade.id }}')">عرض التفاصيل</button>
             </div>
+            {% endfor %}
+            {% else %}
+            <div style="text-align: center; padding: 40px; color: rgba(255, 255, 255, 0.5);">
+                <div style="font-size: 2rem; margin-bottom: 10px;">⏳</div>
+                جاري تحميل الصفقات...
+            </div>
+            {% endif %}
         </div>
     </div>
 
@@ -299,12 +290,93 @@
     </nav>
 
     <script>
+        // Symbol names mapping
+        const symbolNames = {
+            '1120': 'الراجحي',
+            '2222': 'أرامكو',
+            '2010': 'سابك',
+            '7010': 'STC',
+            '4030': 'المراعي',
+            '1180': 'الأهلي'
+        };
+
+        let allTrades = [];
+
+        // Fetch trades on load
+        fetch('/api/trades')
+            .then(res => res.json())
+            .then(data => {
+                allTrades = data;
+                renderTrades(allTrades);
+            })
+            .catch(err => console.error('Error fetching trades:', err));
+
+        function renderTrades(trades) {
+            const container = document.getElementById('tradesList');
+            container.innerHTML = '';
+
+            if (trades.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: rgba(255,255,255,0.5); padding: 20px;">لا توجد صفقات حتى الآن</div>';
+                return;
+            }
+
+            trades.forEach(trade => {
+                const tradeCard = document.createElement('div');
+                tradeCard.className = 'trade-card';
+
+                // Calculate pseudo-profit for display if not available (since API returns basic info)
+                // In real app, this comes from backend. We'll simulate variation based on price.
+                const isBuy = trade.type === 'BUY';
+                const statusClass = trade.status === 'APPROVED' ? 'completed' : 'active';
+                const statusText = trade.status === 'APPROVED' ? 'مكتملة' : 'نشطة';
+
+                // Format date
+                const date = new Date(trade.timestamp);
+                const timeStr = date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+
+                tradeCard.innerHTML = `
+                    <div class="trade-header">
+                        <div class="trade-stock">${isBuy ? '📈' : '📉'} ${symbolNames[trade.symbol] || trade.symbol} (${trade.symbol})</div>
+                        <div class="trade-status ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="trade-robot">🤖 ${trade.bot_name}</div>
+                    <div class="trade-details">
+                        <div class="detail-item">
+                            <div class="detail-label">النوع</div>
+                            <div class="detail-value" style="color: ${isBuy ? '#00ff88' : '#ff6b6b'}">${isBuy ? 'شراء' : 'بيع'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">السعر</div>
+                            <div class="detail-value">${trade.price.toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">الوقت</div>
+                            <div class="detail-value">${timeStr}</div>
+                        </div>
+                    </div>
+                    <button class="view-details-btn" onclick="viewDetails('${trade.id}')">عرض التفاصيل</button>
+                `;
+                container.appendChild(tradeCard);
+            });
+        }
+
         function filterTrades(type) {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             event.target.classList.add('active');
-            // Filter logic here
+
+            if (type === 'all') {
+                renderTrades(allTrades);
+            } else if (type === 'completed') {
+                // For demo, we treat APPROVED as completed
+                const filtered = allTrades.filter(t => t.status === 'APPROVED');
+                renderTrades(filtered);
+            } else {
+                // Active/Pending
+                const filtered = allTrades.filter(t => t.status !== 'APPROVED');
+                renderTrades(filtered);
+            }
         }
 
         function viewDetails(tradeId) {

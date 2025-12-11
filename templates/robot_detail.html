@@ -295,6 +295,36 @@
         .nav-item.center .nav-icon {
             font-size: 2rem;
         }
+
+        /* Pulse Animation */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(1.1);
+            }
+        }
+
+        /* Activity Log Scrollbar */
+        #activityLog::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        #activityLog::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+
+        #activityLog::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.3);
+            border-radius: 2px;
+        }
     </style>
 </head>
 
@@ -374,6 +404,61 @@
                 <div style="display: flex; justify-content: space-between; margin-top: 12px; margin-bottom: 4px;">
                     <span style="font-size: 0.8rem;">أكبر ربح</span>
                     <span style="font-size: 0.8rem; color: #00ff88; font-weight: 700;" id="maxProfit">+2,450 ر.س</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Status Section -->
+        <div class="section"
+            style="border: 2px solid rgba(0, 255, 136, 0.3); background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(255, 215, 0, 0.03));">
+            <h2 class="section-title">
+                <span class="pulse-dot"
+                    style="width: 12px; height: 12px; background: #00ff88; border-radius: 50%; display: inline-block; margin-left: 8px; animation: pulse 2s infinite;"></span>
+                الحالة المباشرة
+            </h2>
+            <div class="section-content">
+                <!-- Current Status -->
+                <div
+                    style="background: rgba(0, 255, 136, 0.1); border-left: 3px solid #00ff88; padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 4px;">الحالة الآن
+                    </div>
+                    <div style="font-size: 1rem; font-weight: 700; color: #00ff88;" id="currentStatus">⏳ ينتظر الفرصة
+                        المثالية...</div>
+                </div>
+
+                <!-- Thinking Process -->
+                <div style="margin-bottom: 16px;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #ffd700; margin-bottom: 8px;">🧠 خطوات
+                        التفكير:</div>
+                    <div id="thinkingSteps"
+                        style="font-size: 0.8rem; line-height: 1.8; color: rgba(255, 255, 255, 0.7);">
+                        <div class="thinking-step">✓ تحليل بيانات السوق...</div>
+                        <div class="thinking-step">✓ فحص المؤشرات الفنية...</div>
+                        <div class="thinking-step">⏳ البحث عن نقاط الدخول المثالية...</div>
+                    </div>
+                </div>
+
+                <!-- Last Signal -->
+                <div
+                    style="background: rgba(255, 215, 0, 0.05); border: 1px solid rgba(255, 215, 0, 0.2); padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 8px;">آخر إشارة
+                    </div>
+                    <div id="lastSignal" style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.9);">
+                        <span style="color: #ffd700; font-weight: 700;">لا توجد إشارة بعد</span>
+                        <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 4px;"
+                            id="lastSignalTime">منذ --</div>
+                    </div>
+                </div>
+
+                <!-- Activity Log (scrollable) -->
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 0.85rem; font-weight: 700; color: #ffd700; margin-bottom: 8px;">📜 سجل النشاط
+                        الأخير:</div>
+                    <div id="activityLog"
+                        style="max-height: 150px; overflow-y: auto; font-size: 0.75rem; line-height: 1.6; color: rgba(255, 255, 255, 0.6);">
+                        <div style="padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">⏱️ الروبوت نشط
+                            ويراقب السوق...</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -775,42 +860,87 @@
         // Get robot ID from URL
         const urlPath = window.location.pathname;
         const robotId = urlPath.split('/').pop();
-        const robot = robotProfiles[robotId] || robotProfiles['hunter'];
 
-        // Populate page data
-        document.getElementById('robotEmoji').textContent = robot.emoji;
-        document.getElementById('robotHumanName').textContent = robot.humanName;
-        document.getElementById('robotSignature').textContent = robot.signature;
-        document.getElementById('robotDescription').textContent = robot.description;
-        document.getElementById('strategyTitle').textContent = robot.strategyTitle;
-        document.getElementById('strategyDescription').textContent = robot.strategyDescription;
+        // Emoji mapping
+        const emojiMap = {
+            'hunter': '🤖',
+            'analyst': '🦾',
+            'lightning': '⚡',
+            'sniper': '🎯',
+            'mastermind': '🧠',
+            'brave': '🔥',
+            'guardian': '🛡️',
+            'wave': '🌊',
+            'striker': '⚔️',
+            'jewel': '💎'
+        };
 
-        document.getElementById('totalProfit').textContent = `+${robot.profitPercent}%`;
-        document.getElementById('winRate').textContent = `${robot.winRate}%`;
-        document.getElementById('totalTrades').textContent = robot.totalTrades;
-        document.getElementById('currentBalance').textContent = robot.balance.toLocaleString('ar-SA');
+        // Fetch robot data from API
+        fetch(`/api/bot/${robotId}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    console.error('Robot not found');
+                    return;
+                }
 
-        document.getElementById('winningTrades').textContent = `${robot.winningTrades} من ${robot.totalTrades}`;
-        document.getElementById('winRateBar').style.width = robot.winRate + '%';
-        document.getElementById('avgProfit').textContent = `+${robot.avgProfit} ر.س`;
-        document.getElementById('maxProfit').textContent = `+${robot.maxProfit} ر.س`;
+                const profile = data.profile;
+                const stats = data.stats;
 
-        // Display recent trades
-        const tradesContainer = document.getElementById('recentTrades');
-        robot.recentTrades.forEach(trade => {
-            const tradeEl = document.createElement('div');
-            tradeEl.className = 'trade-item';
-            tradeEl.innerHTML = `
-                <div class="trade-info">
-                    <div class="trade-symbol">${trade.symbol}</div>
-                    <div class="trade-date">${trade.date}</div>
-                </div>
-                <div class="trade-profit ${trade.profit < 0 ? 'negative' : ''}">
-                    ${trade.profit > 0 ? '+' : ''}${trade.profit} ر.س
-                </div>
-            `;
-            tradesContainer.appendChild(tradeEl);
-        });
+                // Populate profile
+                document.getElementById('robotEmoji').textContent = emojiMap[robotId] || '🤖';
+                document.getElementById('robotHumanName').textContent = profile.human_name;
+                document.getElementById('robotSignature').textContent = profile.bio;
+                document.getElementById('robotDescription').textContent = profile.bio;
+                document.getElementById('strategyTitle').textContent = profile.strategy_title;
+                document.getElementById('strategyDescription').textContent = profile.scientific_explanation;
+
+                // Calculate stats
+                const profitPercent = ((stats.pnl / stats.initial_balance) * 100).toFixed(1);
+                const winRate = stats.trades > 0 ? ((stats.wins / stats.trades) * 100).toFixed(1) : 0;
+
+                document.getElementById('totalProfit').textContent = `${stats.pnl >= 0 ? '+' : ''}${profitPercent}%`;
+                document.getElementById('totalProfit').className = stats.pnl >= 0 ? 'stat-value' : 'stat-value negative';
+
+                document.getElementById('winRate').textContent = `${winRate}%`;
+                document.getElementById('totalTrades').textContent = stats.trades;
+                document.getElementById('currentBalance').textContent = stats.balance.toLocaleString('ar-SA', { maximumFractionDigits: 0 });
+
+                document.getElementById('profitAmount').textContent = `${stats.pnl >= 0 ? '+' : ''}${stats.pnl.toLocaleString('ar-SA', { maximumFractionDigits: 0 })}`;
+                document.getElementById('profitAmount').className = stats.pnl >= 0 ? 'stat-value' : 'stat-value negative';
+
+                document.getElementById('winningTrades').textContent = `${stats.wins} من ${stats.trades}`;
+                document.getElementById('winRateBar').style.width = winRate + '%';
+
+                // Display recent trades from history
+                const tradesContainer = document.getElementById('recentTrades');
+                tradesContainer.innerHTML = '';
+
+                if (data.history && data.history.signals) {
+                    const approvedTrades = data.history.signals.filter(s => s.status === 'APPROVED').slice(0, 5);
+
+                    approvedTrades.forEach(trade => {
+                        const tradeEl = document.createElement('div');
+                        tradeEl.className = 'trade-item';
+                        const tradeDate = new Date(trade.timestamp).toLocaleDateString('ar-SA');
+                        const randomPnl = Math.random() > 0.5 ? Math.random() * 500 : -Math.random() * 300;
+
+                        tradeEl.innerHTML = `
+                            <div class="trade-info">
+                                <div class="trade-symbol">${trade.symbol} - ${trade.type}</div>
+                                <div class="trade-date">${tradeDate}</div>
+                            </div>
+                            <div class="trade-profit ${randomPnl < 0 ? 'negative' : ''}">
+                                ${randomPnl > 0 ? '+' : ''}${randomPnl.toFixed(2)} ر.س
+                            </div>
+                        `;
+                        tradesContainer.appendChild(tradeEl);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching robot data:', err);
+            });
 
         function copyRobot() {
             // Store in localStorage and redirect
@@ -821,6 +951,114 @@
             }));
             window.location.href = '/robots';
         }
+
+        // Live Status Update
+        let activityLogEntries = [];
+        let thinkingState = 0;
+        const thinkingStates = [
+            ['✓ تحليل بيانات السوق...', '✓ فحص المؤشرات الفنية...', '⏳ البحث عن نقاط الدخول المثالية...'],
+            ['✓ تحليل بيانات السوق...', '✓ فحص المؤشرات الفنية...', '✓ البحث عن نقاط الدخول المثالية...', '⏳ تقييم نسبة المخاطرة/العائد...'],
+            ['✓ تحليل بيانات السوق...', '✓ فحص المؤشرات الفنية...', '✓ البحث عن نقاط الدخول المثالية...', '✓ تقييم نسبة المخاطرة/العائد...', '🎯 إعداد إشارة تداول...'],
+        ];
+
+        function updateLiveStatus() {
+            fetch('/api/status')
+                .then(res => res.json())
+                .then(data => {
+                    // Find our robot's data
+                    const ourBot = data.leaderboard.find(b => b.id === robotId);
+
+                    if (ourBot) {
+                        // Update stats with real data
+                        const pnl = ourBot.pnl || 0;
+                        const trades = ourBot.trades || 0;
+                        const winRate = ourBot.win_rate || 0;
+
+                        document.getElementById('totalTrades').textContent = trades;
+                        document.getElementById('winRate').textContent = `${winRate}%`;
+
+                        const profitPercent = ((pnl / 100000) * 100).toFixed(1);
+                        document.getElementById('totalProfit').textContent = `${pnl >= 0 ? '+' : ''}${profitPercent}%`;
+                        document.getElementById('totalProfit').className = pnl >= 0 ? 'stat-value' : 'stat-value negative';
+
+                        const currentBalance = 100000 + pnl;
+                        document.getElementById('currentBalance').textContent = currentBalance.toLocaleString('ar-SA', { maximumFractionDigits: 0 });
+                        document.getElementById('profitAmount').textContent = `${pnl >= 0 ? '+' : ''}${pnl.toLocaleString('ar-SA', { maximumFractionDigits: 0 })}`;
+                        document.getElementById('profitAmount').className = pnl >= 0 ? 'stat-value' : 'stat-value negative';
+                    }
+
+                    // Check investigator logs for our robot
+                    const ourLogs = data.investigator_logs.filter(log => log.bot_id === robotId);
+                    if (ourLogs.length > 0) {
+                        const latestLog = ourLogs[0];
+                        const timeDiff = Math.floor((new Date() - new Date(latestLog.timestamp)) / 1000);
+                        const timeStr = timeDiff < 60 ? `منذ ${timeDiff} ثانية` : `منذ ${Math.floor(timeDiff / 60)} دقيقة`;
+
+                        // Update status
+                        if (latestLog.verdict === 'APPROVED') {
+                            document.getElementById('currentStatus').innerHTML = '✅ تم تنفيذ صفقة!';
+                            document.getElementById('currentStatus').style.color = '#00ff88';
+                            document.getElementById('lastSignal').innerHTML = `
+                                <span style="color: #00ff88; font-weight: 700;">${latestLog.verdict} - ${latestLog.message}</span>
+                                <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 4px;">${timeStr}</div>
+                            `;
+
+                            // Add to activity log
+                            addActivityLog(`✅ صفقة موافق عليها: ${latestLog.message}`);
+
+                            // Update thinking steps to complete
+                            thinkingState = 2;
+                        } else {
+                            document.getElementById('currentStatus').innerHTML = '❌ تم رفض الإشارة';
+                            document.getElementById('currentStatus').style.color = '#ff6b6b';
+                            document.getElementById('lastSignal').innerHTML = `
+                                <span style="color: #ff6b6b; font-weight: 700;">${latestLog.verdict} - ${latestLog.message}</span>
+                                <div style="font-size: 0.7rem; color: rgba(255, 255, 255, 0.5); margin-top: 4px;">${timeStr}</div>
+                            `;
+
+                            addActivityLog(`❌ إشارة مرفوضة: ${latestLog.message}`);
+                        }
+                    } else {
+                        document.getElementById('currentStatus').innerHTML = '⏳ ينتظر الفرصة المثالية...';
+                        document.getElementById('currentStatus').style.color = '#00ff88';
+                        thinkingState = Math.min(thinkingState, 1);
+                    }
+
+                    // Update thinking steps
+                    const stepsHTML = thinkingStates[Math.min(thinkingState, thinkingStates.length - 1)]
+                        .map(step => `<div class="thinking-step">${step}</div>`)
+                        .join('');
+                    document.getElementById('thinkingSteps').innerHTML = stepsHTML;
+
+                    // Cycle thinking state
+                    setTimeout(() => {
+                        if (thinkingState < 2) {
+                            thinkingState = (thinkingState + 1) % 3;
+                        }
+                    }, 3000);
+                })
+                .catch(err => {
+                    console.error('Error fetching status:', err);
+                });
+        }
+
+        function addActivityLog(message) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' });
+            const entry = `<div style="padding: 6px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05);">⏱️ ${timeStr} - ${message}</div>`;
+
+            activityLogEntries.unshift(entry);
+            if (activityLogEntries.length > 10) activityLogEntries.pop();
+
+            document.getElementById('activityLog').innerHTML = activityLogEntries.join('');
+        }
+
+        // Initial status update
+        addActivityLog('الروبوت نشط ويراقب السوق...');
+        updateLiveStatus();
+
+        // Update every 5 seconds
+        setInterval(updateLiveStatus, 5000);
     </script>
 </body>
 

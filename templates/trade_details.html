@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل الصفقة - التقرير الشامل</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- Removng Chart.js as we used TradingView -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            color: #fff;
+            padding-bottom: 80px;
+        }
+
+        .page-container {
+            max-width: 450px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 0;
+        }
+
+        .back-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Chart Section */
+        .chart-container {
+            background: rgba(10, 10, 26, 0.6);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            height: 320px;
+            /* Increased for TV widget */
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Status & Proofs Cards */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px;
+        }
+
+        .info-card.highlight {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        .label {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .highlight-text {
+            color: #ffd700;
+        }
+
+        .green-text {
+            color: #00ff88;
+        }
+
+        .red-text {
+            color: #ff6b6b;
+        }
+
+        /* Audit Report */
+        .audit-section {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .audit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+        }
+
+        .check-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .audit-detail {
+            flex: 1;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .audit-status {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 450px;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            background: rgba(10, 10, 26, 0.98);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="back-btn" onclick="window.location.href='/trades'">←</div>
+            <div class="header-title">تقرير الصفقة #<span id="tradeId">--</span></div>
+        </div>
+
+        <!-- Main Info -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <div style="font-size: 2.5rem; font-weight: 900;" id="pnlDisplay" class="green-text">جاري التحميل...</div>
+            <div style="font-size: 0.9rem; opacity: 0.7;">الصافي المحقق</div>
+        </div>
+
+        <!-- Chart -->
+        <h3 class="section-title" style="margin-bottom:10px;">📉 الرسم البياني لحظة الدخول</h3>
+        <div class="chart-container" id="tv_chart_container">
+            <!-- TradingView Widget will appear here -->
+        </div>
+
+        <!-- Technical Proofs -->
+        <div class="grid-2">
+            <div class="info-card highlight">
+                <div class="label">الروبوت</div>
+                <div class="value highlight-text" id="botName">--</div>
+                <div style="font-size: 0.7rem; opacity: 0.7;" id="botStrategy">--</div>
+            </div>
+            <div class="info-card">
+                <div class="label">السهم</div>
+                <div class="value" id="symbolName">--</div>
+                <div style="font-size: 0.7rem; opacity: 0.7;" id="tradeType">--</div>
+            </div>
+        </div>
+
+        <h3 class="section-title" style="margin-bottom:10px;">🔍 الأدلة التقنية (Technical Proofs)</h3>
+        <div class="grid-2" id="proofsContainer">
+            <!-- Will be filled by JS -->
+        </div>
+
+        <!-- Audit Report -->
+        <div class="audit-section">
+            <div class="section-header">
+                <span class="section-title">🛡️ تقرير المحقق (Audit Logs)</span>
+                <span style="font-size: 0.7rem; color: #00ff88;">✓ تم التحقق</span>
+            </div>
+            <div id="auditList">
+                <!-- Will be filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="/trades" class="nav-item">
+            <div>📋</div>الصفقات
+        </a>
+        <a href="/portfolio" class="nav-item">
+            <div>💼</div>المحفظة
+        </a>
+        <a href="/robots" class="nav-item">
+            <div>🤖</div>الروبوتات
+        </a>
+        <a href="/more" class="nav-item">
+            <div>⚙️</div>المزيد
+        </a>
+    </nav>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlPath = window.location.pathname;
+            const tradeId = urlPath.split('/').pop();
+
+            fetch(`/api/trade/${tradeId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('API Error:', data.error);
+                        document.getElementById('pnlDisplay').textContent = "خطأ";
+                        return;
+                    }
+
+                    const signal = data.signal;
+                    const bot = data.bot;
+                    const pnl = data.pnl || 0;
+                    const ext = data.extended_data || {};
+
+                    // 1. Basic Info
+                    try {
+                        document.getElementById('tradeId').textContent = signal.id;
+                        const pnlDisplay = document.getElementById('pnlDisplay');
+                        pnlDisplay.textContent = (pnl >= 0 ? '+' : '') + pnl.toFixed(2) + ' SAR';
+                        pnlDisplay.className = pnl >= 0 ? 'green-text' : 'red-text';
+
+                        document.getElementById('botName').textContent = bot ? bot.name : 'Unknown';
+                        document.getElementById('botStrategy').textContent = bot ? bot.strategy : '';
+                        document.getElementById('symbolName').textContent = signal.symbol;
+                        document.getElementById('tradeType').textContent = signal.type === 'BUY' ? 'شراء' : 'بيع';
+                    } catch (e) { console.error("Basic info render error", e); }
+
+                    // 2. Render Proofs
+                    try {
+                        if (ext.proofs) {
+                            const container = document.getElementById('proofsContainer');
+                            if (container) {
+                                container.innerHTML = `
+                                <div class="info-card">
+                                    <div class="label">${ext.proofs.primary_indicator?.name || 'المؤشر الرئيسي'}</div>
+                                    <div class="value highlight-text">${ext.proofs.primary_indicator?.value || '-'}</div>
+                                    <div style="font-size:0.65rem; color:#00ff88">${ext.proofs.primary_indicator?.status || '-'}</div>
+                                </div>
+                                <div class="info-card">
+                                    <div class="label">${ext.proofs.secondary_indicator?.name || 'المؤشر الثانوي'}</div>
+                                    <div class="value">${ext.proofs.secondary_indicator?.value || '-'}</div>
+                                    <div style="font-size:0.65rem; opacity:0.7">${ext.proofs.secondary_indicator?.status || '-'}</div>
+                                </div>
+                                <div class="info-card" style="grid-column: span 2;">
+                                    <div class="label">سياق التحليل</div>
+                                    <div style="font-size:0.8rem; line-height:1.4;">${ext.proofs.trend_context || 'لا يوجد'}</div>
+                                </div>
+                            `;
+                            }
+                        }
+                    } catch (e) { console.error("Proofs render error", e); }
+
+                    // 3. Render Audit
+                    try {
+                        if (ext.audit) {
+                            const list = document.getElementById('auditList');
+                            if (list) {
+                                list.innerHTML = ext.audit.map(item => `
+                                <div class="audit-item">
+                                    <div class="check-icon">✓</div>
+                                    <div class="audit-detail">
+                                        <div style="font-weight:700">${item.check}</div>
+                                        <div style="font-size:0.7rem; opacity:0.6">${item.detail}</div>
+                                    </div>
+                                    <div class="audit-status" style="color:#00ff88">${item.status}</div>
+                                </div>
+                            `).join('');
+                            }
+                        }
+                    } catch (e) { console.error("Audit render error", e); }
+
+                    // 4. Render TradingView Widget
+                    try {
+                        const chartContainer = document.getElementById('tv_chart_container');
+                        if (chartContainer && !chartContainer.hasChildNodes()) {
+                            const script = document.createElement('script');
+                            script.src = 'https://s3.tradingview.com/tv.js';
+                            script.async = true;
+                            script.onload = () => {
+                                new TradingView.widget({
+                                    "width": "100%",
+                                    "height": 300,
+                                    "symbol": "TADAWUL:" + signal.symbol,
+                                    "interval": "D",
+                                    "timezone": "Asia/Riyadh",
+                                    "theme": "dark",
+                                    "style": "1",
+                                    "locale": "ar_AE",
+                                    "toolbar_bg": "#f1f3f6",
+                                    "enable_publishing": false,
+                                    "allow_symbol_change": true,
+                                    "container_id": "tv_chart_container"
+                                });
+                            };
+                            chartContainer.appendChild(script);
+                        }
+                    } catch (e) { console.error("Chart render error", e); }
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    document.getElementById('pnlDisplay').textContent = "خطأ اتصال";
+                });
+        });
+    </script>
+</body>
+
+</html>
