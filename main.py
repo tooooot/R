@@ -5,9 +5,11 @@ from news_service import news_service
 import threading
 import time
 import random
+import os
 from portfolio_manager import portfolio_manager
 from news_analyzer import get_analyzer
 from news_fetcher import get_fetcher
+from onesignal_service import get_onesignal_service
 
 app = Flask(__name__)
 
@@ -15,6 +17,20 @@ app = Flask(__name__)
 kc = KnowledgeCenter()
 cm = ChallengeManager()
 cm.start_new_challenge()
+
+# Initialize OneSignal (optional - only if keys provided)
+try:
+    onesignal = get_onesignal_service(
+        app_id=os.getenv('ONESIGNAL_APP_ID'),
+        rest_api_key=os.getenv('ONESIGNAL_REST_API_KEY')
+    )
+    if onesignal:
+        print("✅ OneSignal notifications enabled")
+    else:
+        print("⚠️ OneSignal keys not found - notifications disabled")
+except Exception as e:
+    print(f"⚠️ OneSignal init failed: {e}")
+    onesignal = None
 
 def background_market_simulation():
     """Background thread to keep market data updated."""
@@ -66,6 +82,17 @@ def background_bot_engine():
                     # Random PnL for simulation (-500 to +1000)
                     pnl = random.uniform(-500, 1000)
                     cm.update_score(bot.bot_id, pnl)
+                    
+                    # Send notification for winning trades
+                    if pnl > 0 and onesignal:
+                        try:
+                            onesignal.notify_winning_trade(
+                                robot_name=bot.name,
+                                symbol=logged_signal['symbol'],
+                                profit=pnl
+                            )
+                        except Exception as e:
+                            print(f"Notification error: {e}")
 
         time.sleep(3) # Wait before next round of analysis
 
