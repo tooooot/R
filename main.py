@@ -137,6 +137,10 @@ def news_center_view():
 def robots_view():
     return render_template('robots.html')
 
+@app.route('/robot/<robot_id>')
+def robot_detail_view(robot_id):
+    return render_template('robot_detail.html')
+
 @app.route('/portfolio')
 def portfolio_view():
     return render_template('portfolio.html')

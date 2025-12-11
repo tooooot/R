@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بروفايل الروبوت</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1432 50%, #0d0d2b 100%);
+            color: #fff;
+        }
+
+        .page-container {
+            max-width: 393px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding: 12px 12px 120px 12px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 170, 0, 0.05));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 215, 0, 0.05) 50%, transparent 70%);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .robot-avatar {
+            font-size: 5rem;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .robot-human-name {
+            font-size: 1.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .robot-signature {
+            font-size: 0.9rem;
+            font-style: italic;
+            color: rgba(255, 215, 0, 0.8);
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .robot-signature::before,
+        .robot-signature::after {
+            content: '"';
+            font-size: 1.5rem;
+            color: rgba(255, 215, 0, 0.5);
+        }
+
+        .robot-description {
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #00ff88;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.negative {
+            color: #ff6b6b;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Section */
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #ffd700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-content {
+            font-size: 0.85rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        /* Performance Chart */
+        .performance-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            height: 8px;
+            margin: 8px 0;
+            overflow: hidden;
+        }
+
+        .performance-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00cc6a);
+            border-radius: 8px;
+            transition: width 1s ease-in-out;
+        }
+
+        /* Trade List */
+        .trade-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .trade-info {
+            flex: 1;
+        }
+
+        .trade-symbol {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffd700;
+            margin-bottom: 4px;
+        }
+
+        .trade-date {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .trade-profit {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #00ff88;
+        }
+
+        .trade-profit.negative {
+            color: #ff6b6b;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 393px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            background: rgba(10, 10, 26, 0.98);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.7rem;
+            padding: 8px 12px;
+            border-radius: 12px;
+        }
+
+        .nav-item.center {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+            transform: scale(1.15);
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+            margin-top: -20px;
+            border: 3px solid rgba(10, 10, 26, 0.9);
+        }
+
+        .nav-icon {
+            font-size: 1.5rem;
+        }
+
+        .nav-item.center .nav-icon {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <div class="robot-avatar" id="robotEmoji">🤖</div>
+            <h1 class="robot-human-name" id="robotHumanName">خالد الصياد</h1>
+            <p class="robot-signature" id="robotSignature">الفرصة لا تأتي مرتين، أنا هنا لأغتنمها</p>
+            <p class="robot-description" id="robotDescription">
+                روبوت تداول متخصص في اقتناص الفرص القصيرة المدى بدقة عالية. تم تدريبه على أكثر من 10,000 حالة سوق
+                مختلفة.
+            </p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalProfit">+12.5%</div>
+                <div class="stat-label">إجمالي الربح</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="winRate">83%</div>
+                <div class="stat-label">نسبة النجاح</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalTrades">27</div>
+                <div class="stat-label">عدد الصفقات</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="currentBalance">112,500</div>
+                <div class="stat-label">الرصيد الحالي</div>
+            </div>
+        </div>
+
+        <!-- Strategy Section -->
+        <div class="section">
+            <h2 class="section-title">⚡ الاستراتيجية</h2>
+            <div class="section-content">
+                <h3 style="color: #ffd700; margin-bottom: 8px;" id="strategyTitle">استراتيجية الاختراق السريع</h3>
+                <p id="strategyDescription">
+                    تعتمد على مؤشر RSI ومتوسطات الحركة (MA) لتحديد نقاط الدخول والخروج المثالية.
+                    يبحث الروبوت عن إشارات اختراق قوية مع تأكيد من حجم التداول، ويدخل الصفقات فقط عندما تكون نسبة
+                    المخاطرة/العائد 1:3 أو أفضل.
+                    يستخدم Stop Loss ديناميكي للحفاظ على الأرباح.
+                </p>
+            </div>
+        </div>
+
+        <!-- Performance Section -->
+        <div class="section">
+            <h2 class="section-title">📊 الأداء</h2>
+            <div class="section-content">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 0.8rem;">صفقات رابحة</span>
+                    <span style="font-size: 0.8rem; color: #00ff88; font-weight: 700;" id="winningTrades">22 من
+                        27</span>
+                </div>
+                <div class="performance-bar">
+                    <div class="performance-fill" id="winRateBar" style="width: 83%"></div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 16px; margin-bottom: 4px;">
+                    <span style="font-size: 0.8rem;">متوسط الربح</span>
+                    <span style="font-size: 0.8rem; color: #00ff88; font-weight: 700;" id="avgProfit">+850 ر.س</span>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; margin-top: 12px; margin-bottom: 4px;">
+                    <span style="font-size: 0.8rem;">أكبر ربح</span>
+                    <span style="font-size: 0.8rem; color: #00ff88; font-weight: 700;" id="maxProfit">+2,450 ر.س</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="section">
+            <h2 class="section-title">💰 آخر الصفقات الرابحة</h2>
+            <div class="section-content" id="recentTrades">
+                <!-- Will be populated by JS -->
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="window.location.href='/robots'">← رجوع</button>
+            <button class="btn btn-primary" onclick="copyRobot()">نسخ الروبوت</button>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav">
+        <a href="/trades" class="nav-item">
+            <div class="nav-icon">📋</div>
+            <div>الصفقات</div>
+        </a>
+        <a href="/portfolio" class="nav-item">
+            <div class="nav-icon">💼</div>
+            <div>المحفظة</div>
+        </a>
+        <a href="/robots" class="nav-item center">
+            <div class="nav-icon">🤖</div>
+            <div>الروبوتات</div>
+        </a>
+        <a href="/reporter" class="nav-item">
+            <div class="nav-icon">📰</div>
+            <div>الراصد</div>
+        </a>
+        <a href="/more" class="nav-item">
+            <div class="nav-icon">⚙️</div>
+            <div>المزيد</div>
+        </a>
+    </nav>
+
+    <script>
+        // Robot profiles data
+        const robotProfiles = {
+            'hunter': {
+                emoji: '🤖',
+                humanName: 'خالد الصياد',
+                signature: 'الفرصة لا تأتي مرتين، أنا هنا لأغتنمها',
+                description: 'روبوت تداول متخصص في اقتناص الفرص القصيرة المدى بدقة عالية. تم تدريبه على أكثر من 10,000 حالة سوق مختلفة.',
+                strategyTitle: 'استراتيجية الاختراق السريع',
+                strategyDescription: 'تعتمد على مؤشر RSI ومتوسطات الحركة (MA) لتحديد نقاط الدخول والخروج المثالية. يبحث الروبوت عن إشارات اختراق قوية مع تأكيد من حجم التداول، ويدخل الصفقات فقط عندما تكون نسبة المخاطرة/العائد 1:3 أو أفضل.',
+                profitPercent: 12.5,
+                winRate: 83,
+                totalTrades: 27,
+                balance: 112500,
+                winningTrades: 22,
+                avgProfit: 850,
+                maxProfit: 2450,
+                recentTrades: [
+                    { symbol: 'أرامكو', date: '2025-12-10', profit: 1250 },
+                    { symbol: 'الراجحي', date: '2025-12-09', profit: 980 },
+                    { symbol: 'سابك', date: '2025-12-08', profit: 1450 },
+                    { symbol: 'STC', date: '2025-12-07', profit: 750 },
+                    { symbol: 'الأهلي', date: '2025-12-06', profit: 620 }
+                ]
+            },
+            'analyst': {
+                emoji: '🦾',
+                humanName: 'فهد المحلل',
+                signature: 'البيانات لا تكذب، أنا أقرأها بعمق',
+                description: 'روبوت تحليلي يعتمد على البيانات الأساسية والتقنية معاً. يفضل الصفقات المتوسطة الأجل مع نسبة مخاطرة منخفضة.',
+                strategyTitle: 'التحليل الثنائي المتقدم',
+                strategyDescription: 'يجمع بين التحليل الأساسي (الأخبار والتقارير) والتحليل الفني (الأنماط والمؤشرات). يستخدم نظام تصنيف متقدم لتقييم قوة الإشارة قبل الدخول.',
+                profitPercent: 8.2,
+                winRate: 78,
+                totalTrades: 23,
+                balance: 108200,
+                winningTrades: 18,
+                avgProfit: 720,
+                maxProfit: 1980,
+                recentTrades: [
+                    { symbol: 'سابك', date: '2025-12-10', profit: 1100 },
+                    { symbol: 'أرامكو', date: '2025-12-09', profit: 890 },
+                    { symbol: 'البحري', date: '2025-12-08', profit: 650 }
+                ]
+            },
+            'lightning': {
+                emoji: '⚡',
+                humanName: 'سلطان السريع',
+                signature: 'السرعة هي السلاح، والدقة هي الهدف',
+                description: 'متخصص في التداول اللحظي (Scalping) بسرعة فائقة. يستهدف أرباح صغيرة متكررة على مدار اليوم.',
+                strategyTitle: 'Scalping الذكي',
+                strategyDescription: 'يعتمد على فروقات الأسعار الصغيرة والتحركات اللحظية. يدخل ويخرج من الصفقات في ثوانٍ معدودة مستفيداً من التقلبات الصغيرة.',
+                profitPercent: 6.8,
+                winRate: 72,
+                totalTrades: 45,
+                balance: 106800,
+                winningTrades: 32,
+                avgProfit: 380,
+                maxProfit: 950,
+                recentTrades: [
+                    { symbol: 'الراجحي', date: '2025-12-10', profit: 420 },
+                    { symbol: 'STC', date: '2025-12-10', profit: 380 },
+                    { symbol: 'أرامكو', date: '2025-12-10', profit: 290 }
+                ]
+            }
+        };
+
+        // Get robot ID from URL
+        const urlPath = window.location.pathname;
+        const robotId = urlPath.split('/').pop();
+        const robot = robotProfiles[robotId] || robotProfiles['hunter'];
+
+        // Populate page data
+        document.getElementById('robotEmoji').textContent = robot.emoji;
+        document.getElementById('robotHumanName').textContent = robot.humanName;
+        document.getElementById('robotSignature').textContent = robot.signature;
+        document.getElementById('robotDescription').textContent = robot.description;
+        document.getElementById('strategyTitle').textContent = robot.strategyTitle;
+        document.getElementById('strategyDescription').textContent = robot.strategyDescription;
+
+        document.getElementById('totalProfit').textContent = `+${robot.profitPercent}%`;
+        document.getElementById('winRate').textContent = `${robot.winRate}%`;
+        document.getElementById('totalTrades').textContent = robot.totalTrades;
+        document.getElementById('currentBalance').textContent = robot.balance.toLocaleString('ar-SA');
+
+        document.getElementById('winningTrades').textContent = `${robot.winningTrades} من ${robot.totalTrades}`;
+        document.getElementById('winRateBar').style.width = robot.winRate + '%';
+        document.getElementById('avgProfit').textContent = `+${robot.avgProfit} ر.س`;
+        document.getElementById('maxProfit').textContent = `+${robot.maxProfit} ر.س`;
+
+        // Display recent trades
+        const tradesContainer = document.getElementById('recentTrades');
+        robot.recentTrades.forEach(trade => {
+            const tradeEl = document.createElement('div');
+            tradeEl.className = 'trade-item';
+            tradeEl.innerHTML = `
+                <div class="trade-info">
+                    <div class="trade-symbol">${trade.symbol}</div>
+                    <div class="trade-date">${trade.date}</div>
+                </div>
+                <div class="trade-profit ${trade.profit < 0 ? 'negative' : ''}">
+                    ${trade.profit > 0 ? '+' : ''}${trade.profit} ر.س
+                </div>
+            `;
+            tradesContainer.appendChild(tradeEl);
+        });
+
+        function copyRobot() {
+            // Store in localStorage and redirect
+            localStorage.setItem('selectedRobot', JSON.stringify({
+                id: robotId,
+                name: robot.humanName,
+                emoji: robot.emoji
+            }));
+            window.location.href = '/robots';
+        }
+    </script>
+</body>
+
+</html>
