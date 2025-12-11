@@ -25,11 +25,11 @@ try:
         rest_api_key=os.getenv('ONESIGNAL_REST_API_KEY')
     )
     if onesignal:
-        print("✅ OneSignal notifications enabled")
+        print("[OK] OneSignal notifications enabled")
     else:
-        print("⚠️ OneSignal keys not found - notifications disabled")
+        print("[WARN] OneSignal keys not found - notifications disabled")
 except Exception as e:
-    print(f"⚠️ OneSignal init failed: {e}")
+    print(f"[WARN] OneSignal init failed: {e}")
     onesignal = None
 
 def background_market_simulation():
@@ -82,7 +82,7 @@ def background_bot_engine():
                     # Random PnL for simulation (-500 to +1000)
                     pnl = random.uniform(-500, 1000)
                     cm.update_score(bot.bot_id, pnl)
-                    print(f"💰 Trade Complete: {bot.name} ({bot.bot_id}) -> {signal['type']} {signal['symbol']} | PnL: {pnl:+.2f} SAR")
+                    print(f"[TRADE] Trade Complete: {bot.name} ({bot.bot_id}) -> {signal['type']} {signal['symbol']} | PnL: {pnl:+.2f} SAR")
                     
                     # Send notification for winning trades
                     if pnl > 0 and onesignal:
@@ -558,8 +558,11 @@ def get_robots_api():
             'bio': bot.bio,
             'strategy': bot.strategy_title,
             'risk': bot.risk,
+            'balance': perf_data.get('balance', 100000),
             'profit_percent': perf_data.get('profit_pct', 0),
-            'trades': perf_data.get('total_trades', 0),
+            'trades': perf_data.get('trades', 0),
+            'wins': perf_data.get('wins', 0),
+            'losses': perf_data.get('losses', 0),
             'success_rate': perf_data.get('win_rate', 0)
         }
         robots.append(robot)

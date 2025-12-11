@@ -54,7 +54,11 @@ class ChallengeManager:
             ranking.append({
                 "id": bid,
                 "pnl": round(stats["pnl"], 2),
+                "profit_pct": round((stats["pnl"] / 100000) * 100, 2), # Assuming 100k capital
+                "balance": round(100000 + stats["pnl"], 2),
                 "trades": stats["trades"],
+                "wins": stats["wins"],
+                "losses": stats["trades"] - stats["wins"],
                 "win_rate": round((stats["wins"] / stats["trades"] * 100), 1) if stats["trades"] > 0 else 0,
                 "status": stats["status"]
             })

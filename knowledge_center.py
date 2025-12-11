@@ -22,29 +22,15 @@ class KnowledgeCenter:
                     cls._instance.news_service = NewsService()
                     
                     # TASI Tickers to track
-                    cls._instance.tickers = ["1120", "2222", "2010", "7010", "4030", "1180"] # Rajhi, Aramco, SABIC, STC, Almarai, NCB
+                    cls._instance.tickers = ["1120.SR", "2222.SR", "2010.SR", "7010.SR", "4030.SR", "1180.SR"] # Added .SR for yfinance
+                    
+                    # Initialize with mock data to prevent blocking
+                    import random
+                    for ticker in cls._instance.tickers:
+                        cls._instance.market_data[ticker] = random.uniform(20.0, 100.0)
+                        
+                    cls._instance.market_status = "OPEN"
         return cls._instance
-
-        # In a real scenario, this fetches from Yahoo Finance or Tadawul API
-        # Here we simulate random movement for the scenario
-        timestamp = datetime.datetime.now()
-        snapshot = {"timestamp": timestamp, "prices": {}}
-        
-        if not self.market_data:
-            # Initialize with dummy base prices if empty
-            for sym in self.saudi_symbols:
-                self.market_data[sym] = random.uniform(20.0, 150.0)
-        
-        for sym in self.saudi_symbols:
-            # Random stick movement (-1% to +1%)
-            change = random.uniform(-0.01, 0.01)
-            self.market_data[sym] *= (1 + change)
-            snapshot["prices"][sym] = self.market_data[sym]
-            
-        self.market_history.append(snapshot)
-        return self.market_data
-
-        self.market_status = "OPEN" # OPEN, CLOSED
         
     def update_market_data(self):
         """Fetches REAL data from MarketService."""
